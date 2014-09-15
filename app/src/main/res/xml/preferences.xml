@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (c) 2014, David Forsythe
+  ~ All rights reserved.
+  ~
+  ~ Redistribution and use in source and binary forms, with or without
+  ~ modification, are permitted provided that the following conditions are met:
+  ~
+  ~ * Redistributions of source code must retain the above copyright notice, this
+  ~   list of conditions and the following disclaimer.
+  ~
+  ~ * Redistributions in binary form must reproduce the above copyright notice,
+  ~   this list of conditions and the following disclaimer in the documentation
+  ~   and/or other materials provided with the distribution.
+  ~
+  ~ * Neither the name of Luchadeer nor the names of its
+  ~   contributors may be used to endorse or promote products derived from
+  ~   this software without specific prior written permission.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  ~ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  ~ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  ~ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  ~ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  ~ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  ~ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  ~ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  ~ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  ~ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Account Settings">
+
+        <Preference
+            android:key="pref_account_link" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Push Notifications" >
+
+        <SwitchPreference
+            android:title="Push Notifications"
+            android:key="@string/pref_push_notification"
+            android:summary="Push notifications for newly available videos"
+            android:disableDependentsState="false" />
+
+        <MultiSelectListPreference
+            android:title="Notification Categories"
+            android:key="@string/pref_push_notification_categories"
+            android:summary="Choose push enabled video categories"
+            android:dependency="@string/pref_push_notification"
+            android:defaultValue="@array/empty"
+            android:entries="@array/empty"
+            android:entryValues="@array/empty" />
+
+        <CheckBoxPreference
+            android:title="Vibrate"
+            android:key="@string/pref_push_notification_vibrate"
+            android:summary="Vibrate upon notification of newly available videos"
+            android:dependency="@string/pref_push_notification"/>
+        <CheckBoxPreference
+            android:title="LED Light"
+            android:key="@string/pref_push_notification_led"
+            android:summary="Have LED light show upon notification of newly available videos"
+            android:dependency="@string/pref_push_notification"/>
+
+    </PreferenceCategory>
+
+    <!-- not implemented yet
+    <PreferenceCategory
+        android:title="Sharing">
+
+        <CheckBoxPreference
+            android:title="Share recent watched videos"
+            android:summary="Anonymously share recently watched videos"
+            android:key="@string/pref_share_watched_videos"/>
+        <CheckBoxPreference
+            android:title="Share recent searches"
+            android:summary="Anonymously share recently searched terms"
+            android:key="@string/pref_share_recent_searches"/>
+        <CheckBoxPreference
+            android:title="Share recent viewed games"
+            android:summary="Anonymously share recently viewed games"
+            android:key="@string/pref_share_viewed_games"/>
+
+    </PreferenceCategory>
+    -->
+
+    <PreferenceCategory android:title="App Details">
+        <Preference android:title="Version"
+            android:key="app_version">
+
+        </Preference>
+
+        <Preference android:title="Credits"
+            android:key="app_credits">
+
+        </Preference>
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

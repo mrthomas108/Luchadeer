@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2014, David Forsythe
+  ~ All rights reserved.
+  ~
+  ~ Redistribution and use in source and binary forms, with or without
+  ~ modification, are permitted provided that the following conditions are met:
+  ~
+  ~ * Redistributions of source code must retain the above copyright notice, this
+  ~   list of conditions and the following disclaimer.
+  ~
+  ~ * Redistributions in binary form must reproduce the above copyright notice,
+  ~   this list of conditions and the following disclaimer in the documentation
+  ~   and/or other materials provided with the distribution.
+  ~
+  ~ * Neither the name of Luchadeer nor the names of its
+  ~   contributors may be used to endorse or promote products derived from
+  ~   this software without specific prior written permission.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  ~ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  ~ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  ~ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  ~ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  ~ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  ~ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  ~ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  ~ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  ~ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+
+<resources>
+
+    <string name="app_name">Luchadeer</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="nav_videos">Videos</string>
+    <string name="nav_games">Games</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_downloads">Downloads</string>
+    <string name="nav_account">Account</string>
+    <string name="nav_preferences">Preferences</string>
+    <string name="nav_giant_bomb">Giant Bomb</string>
+    <string name="nav_github">Github</string>
+
+    <string name="tab_videos">Videos</string>
+    <string name="tab_games">Games</string>
+
+    <string name="category_list_header_video">Video</string>
+    <!-- this should actually just be in a different strings file -->
+    <string name="category_list_header_video_colon">Video: </string>
+
+    <string name="loading">Loading...</string>
+
+    <string name="link_code_hint">Link Code</string>
+    <string name="link_account">Link Account</string>
+
+    <string name="account_already_linked">It looks like this app is already linked to a Giant Bomb user!</string>
+    <string name="unlink_account">Unlink Account</string>
+
+    <string name="download_complete">Download complete!</string>
+    <string name="download_failed">Download failed</string>
+    <string name="downloading">Downloading...</string>
+
+    <string name="related_videos">Videos</string>
+    <string name="similar_games">Similar Games</string>
+
+    <string-array name="empty">
+    </string-array>
+
+    <string name="giant_bomb_web_uri">http://www.giantbomb.com</string>
+    <string name="github_web_uri">https://github.com/dforsyth/luchadeer</string>
+
+    <string name="title_activity_link_subscription">Link Account</string>
+    <string name="boxee_text">As a Giant Bomb user, you can find your link code at <a href="http://giantbomb.com/boxee">giantbomb.com/boxee</a></string>
+    <string name="cant_cast_local_content">
+        Luchadeer can\'t cast local (downloaded) content yet. You can cast local videos through another application, like
+        <a href="https://play.google.com/store/apps/details?id=com.bubblesoft.android.bubbleupnp">BubbleUPnP</a>.
+        To see the other applications that can play a video, long press the play button of the video you want to watch.
+    </string>
+    <string name="cant_play_unfinished_download">
+        This video isn\'t finished downloading yet! You can still play it from the web, though.
+    </string>
+
+    <string name="new_giant_bomb_video">New Giant Bomb Video!</string>
+    <string name="live_chat_detected">It looks like the Giant Bomb Chat is live!</string>
+
+    <string name="favorite_added">Added favorite</string>
+    <string name="favorite_removed">Removed favorite</string>
+
+    <string name="video_list_empty">No videos found. Pull to retry.</string>
+    <string name="game_list_empty">No games found. Pull to retry.</string>
+    <string name="no_downloads">No downloads yet!</string>
+
+    <string name="account_linked_message">Account linked!</string>
+    <string name="account_link_code_invalid">Link code is not valid! Try again.</string>
+    <string name="validate_request_error">Something went wrong! Try again.</string>
+
+    <string name="video_favorites_empty">No favorite videos yet!</string>
+    <string name="game_favorites_empty">No favorite games yet!</string>
+
+    <string name="title_activity_video_detail">Video</string>
+    <string name="title_activity_game_detail">Game</string>
+    <string name="title_activity_search">Search</string>
+    <string name="search_hint">Search Videos and Games</string>
+    <string name="title_activity_favorites">Favorites</string>
+
+    <!-- SECRETS
+    <string name="cast_application_id"></string>
+    <string name="gcm_sender_id"></string>
+    <string name="unlinked_base_uri"></string>
+    -->
+
+    <string name="pref_gcm_registration_id">org.dforsyth.android.giantbomb.preference.gcm_registration_id</string>
+    <string name="pref_gcm_registration_version">org.dforsyth.android.giantbomb.preference.gcm_registration_version</string>
+
+    <string name="pref_api_key">org.dforsyth.android.giantbomb.preference.api_key</string>
+
+    <string name="pref_quality">org.dforsyth.android.giantbomb.preference.quality</string>
+
+    <string name="pref_video_type_cache">org.dforsyth.android.preference.video_type_cache</string>
+
+    <string name="pref_push_notification">org.dforsyth.android.giantbomb.preference.push_notification</string>
+    <string name="pref_push_notification_categories">org.dforsyth.android.giantbomb.preference.push_notification_categories</string>
+    <string name="pref_push_notification_vibrate">org.dforsyth.android.giantbomb.preference.push_notification_vibrate</string>
+    <string name="pref_push_notification_led">org.dforsyth.android.giantbomb.preference.push_notification_led</string>
+
+    <string name="pref_share_watched_videos">org.dforsyth.android.giantbomb.preference.share_watched_videos</string>
+    <string name="pref_share_recent_searches">org.dforsyth.android.giantbomb.preference.share_recent_searches</string>
+    <string name="pref_share_viewed_games">org.dforsyth.android.giantbomb.preference.share_viewed_games</string>
+
+    <string name="giantbomb_request_error">We\'re having some trouble with the Giant Bomb API. Try again soon!</string>
+    <string name="subscriber_content_error">Can\'t request subscriber content. Please link your subscriber account an try again.</string>
+    <string name="rate_limit_error">Giant Bomb is enforcing its rate limit. Take a break and try again in a few minutes.</string>
+    <string name="giantbomb_not_found_error">Sorry, Giant Bomb doesn\'t seem to have what you\'re looking for.</string>
+
+    <string name="luchadeer_quota_error">Luchadeer is over capacity! Link your Giant Bomb account to avoid problems like this in the future.</string>
+    <string name="luchadeer_request_error">There was a problem with your request. Try again later.</string>
+
+</resources>

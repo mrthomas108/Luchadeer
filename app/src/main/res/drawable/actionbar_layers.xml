@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/gradient_layer" android:drawable="@drawable/transparent_black_to_transparent_gradient"/>
+    <item android:id="@+id/color_layer" android:drawable="@color/gb_grey" />
+</layer-list>
