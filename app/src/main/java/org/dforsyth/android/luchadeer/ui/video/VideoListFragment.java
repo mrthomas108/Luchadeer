@@ -525,6 +525,7 @@ public class VideoListFragment extends ContentListFragment implements
                         mVideoArrayAdapter = new VideoArrayAdapter(getActivity());
                         setListAdapter(mVideoArrayAdapter);
                         mVideos.clear();
+                        mOffset = 0;
                         setListShown(false);
 
                         getLoaderManager().restartLoader(VIDEOS_LIST_LOADER_ID, null, VideoListFragment.this);
