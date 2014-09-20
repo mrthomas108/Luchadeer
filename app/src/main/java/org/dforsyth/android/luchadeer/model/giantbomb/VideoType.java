@@ -30,12 +30,15 @@
 
 package org.dforsyth.android.luchadeer.model.giantbomb;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
 
-public class VideoType implements Serializable {
+public class VideoType implements Serializable, Parcelable {
     @SerializedName("api_detail_url") private String mApiDetailUrl;
     @SerializedName("deck") private String mDeck;
     @SerializedName("id") private String mId;
@@ -60,5 +63,38 @@ public class VideoType implements Serializable {
 
     public String getSiteDetailUrl() {
         return mSiteDetailUrl;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(mApiDetailUrl);
+        parcel.writeString(mDeck);
+        parcel.writeString(mId);
+        parcel.writeString(mName);
+        parcel.writeString(mSiteDetailUrl);
+    }
+
+    public static final Parcelable.Creator<VideoType> CREATOR
+            = new Parcelable.Creator<VideoType>() {
+        public VideoType createFromParcel(Parcel in) {
+            return new VideoType(in);
+        }
+
+        public VideoType[] newArray(int size) {
+            return new VideoType[size];
+        }
+    };
+
+    private VideoType(Parcel in) {
+        mApiDetailUrl = in.readString();
+        mDeck = in.readString();
+        mId = in.readString();
+        mName = in.readString();
+        mSiteDetailUrl = in.readString();
     }
 }

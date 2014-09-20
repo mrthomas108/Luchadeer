@@ -94,6 +94,8 @@ public class VideoListFragment extends ContentListFragment implements
 
     private ActionBar mActionBar;
 
+    private BatchContentObserver mContentObserver;
+
     private OnVideoSelectedListener mOnVideoSelectedListener;
 
     private final static String ARG_CATEGORY_ID = "category_id";
@@ -177,7 +179,7 @@ public class VideoListFragment extends ContentListFragment implements
 
         if (savedInstanceState != null) {
             // load old state
-            mVideoTypes = (ArrayList<VideoType>) savedInstanceState.getSerializable(STATE_VIDEO_TYPES);
+            mVideoTypes = savedInstanceState.getParcelableArrayList(STATE_VIDEO_TYPES);
             mVideosTmp = savedInstanceState.getParcelableArrayList(STATE_VIDEOS);
             mTotalResults = savedInstanceState.getInt(STATE_TOTAL_RESULTS);
             mCategoryId = savedInstanceState.getString(STATE_CATEGORY_ID);
@@ -192,13 +194,11 @@ public class VideoListFragment extends ContentListFragment implements
         }
     }
 
-    private BatchContentObserver observer;
-
     @Override
     public void onStart() {
         super.onStart();
 
-        observer = new BatchContentObserver(new BatchContentObserver.OnChangeListener() {
+        mContentObserver = new BatchContentObserver(new BatchContentObserver.OnChangeListener() {
             @Override
             public void onChange(boolean selfChange) {
                 if (mVideoArrayAdapter != null) {
@@ -210,7 +210,7 @@ public class VideoListFragment extends ContentListFragment implements
         getActivity().getContentResolver().registerContentObserver(
                 LuchadeerContract.VideoViewStatus.CONTENT_URI,
                 false,
-                observer
+                mContentObserver
         );
     }
 
@@ -226,7 +226,7 @@ public class VideoListFragment extends ContentListFragment implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putSerializable(STATE_VIDEO_TYPES, mVideoTypes);
+        outState.putParcelableArrayList(STATE_VIDEO_TYPES, mVideoTypes);
         outState.putParcelableArrayList(STATE_VIDEOS, mVideos);
         outState.putInt(STATE_TOTAL_RESULTS, mTotalResults);
         outState.putString(STATE_CATEGORY_ID, mCategoryId);
@@ -236,7 +236,7 @@ public class VideoListFragment extends ContentListFragment implements
     @Override
     public void onStop() {
         super.onStop();
-        getActivity().getContentResolver().unregisterContentObserver(observer);
+        getActivity().getContentResolver().unregisterContentObserver(mContentObserver);
     }
 
     @Override
