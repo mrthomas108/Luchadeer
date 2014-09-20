@@ -78,8 +78,9 @@ public class VideoListFragment extends ContentListFragment implements
 
     private ArrayList<VideoType> mVideoTypes;
     private ArrayList<Video> mVideos;
-    private int mOffset;
     private ArrayList<Video> mVideosTmp;
+    private int mOffset;
+    private int mOffsetTmp;
     private int mTotalResults;
 
     private VideoArrayAdapter mVideoArrayAdapter;
@@ -100,6 +101,7 @@ public class VideoListFragment extends ContentListFragment implements
     private static final String STATE_VIDEOS = "videos";
     private static final String STATE_TOTAL_RESULTS = "total_results";
     private static final String STATE_CATEGORY_ID = "category_id";
+    private static final String STATE_OFFSET = "offset";
 
     private static final int VIDEOS_LIST_LOADER_ID = 1;
 
@@ -182,6 +184,7 @@ public class VideoListFragment extends ContentListFragment implements
             mVideosTmp = savedInstanceState.getParcelableArrayList(STATE_VIDEOS);
             mTotalResults = savedInstanceState.getInt(STATE_TOTAL_RESULTS);
             mCategoryId = savedInstanceState.getString(STATE_CATEGORY_ID);
+            mOffsetTmp = savedInstanceState.getInt(STATE_OFFSET);
         }
 
         // this should actually check mVideosTmp
@@ -230,6 +233,7 @@ public class VideoListFragment extends ContentListFragment implements
         outState.putParcelableArrayList(STATE_VIDEOS, mVideos);
         outState.putInt(STATE_TOTAL_RESULTS, mTotalResults);
         outState.putString(STATE_CATEGORY_ID, mCategoryId);
+        outState.putInt(STATE_OFFSET, mOffset);
     }
 
     @Override
@@ -303,7 +307,7 @@ public class VideoListFragment extends ContentListFragment implements
 
         if (videos != null) {
             VideosListLoader loader = (VideosListLoader) arrayListLoader;
-            onVideosRequestCompleted(videos, loader.getAvailableItemCount());
+            onVideosRequestCompleted(videos, loader.getAvailableItemCount(), videos.size());
         } else {
             Util.handleVolleyError(getActivity(), error);
             onRequestVideosFailed();
@@ -409,7 +413,7 @@ public class VideoListFragment extends ContentListFragment implements
         mSwipeRefreshLayout.setEnabled(true);
     }
 
-    public void onVideosRequestCompleted(ArrayList<Video> videos, int totalNumberOfResults) {
+    public void onVideosRequestCompleted(ArrayList<Video> videos, int totalNumberOfResults, int offset) {
         if (mVideoArrayAdapter == null) {
             mVideoArrayAdapter = new VideoArrayAdapter(getActivity());
             setListAdapter(mVideoArrayAdapter);
@@ -427,7 +431,7 @@ public class VideoListFragment extends ContentListFragment implements
             mOffset = 0;
         }
 
-        mOffset += videos.size();
+        mOffset += offset; // videos.size();
         mVideos.addAll(filterTrailers(videos));
 
         mVideoArrayAdapter.notifyDataSetChanged();
@@ -537,7 +541,7 @@ public class VideoListFragment extends ContentListFragment implements
         if (mVideosTmp == null || mVideosTmp.isEmpty()) {
             getLoaderManager().initLoader(VIDEOS_LIST_LOADER_ID, null, this);
         } else {
-            onVideosRequestCompleted(mVideosTmp, mTotalResults);
+            onVideosRequestCompleted(mVideosTmp, mTotalResults, mOffsetTmp);
         }
     }
 
