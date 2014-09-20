@@ -209,6 +209,7 @@ public class GameDetailFragment extends Fragment implements
 
         mLoadingView = inflater.inflate(R.layout.list_loading_item, null, false);
 
+        // TODO turn this into a listview to speed up view build
         mScrollView = (ParallaxScrollView) rootView.findViewById(R.id.scrollview);
 
         mStickyHeader = mScrollView.findViewById(R.id.game_header);

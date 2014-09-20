@@ -124,9 +124,6 @@ public class VideoListFragment extends ContentListFragment implements
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        /* normally we'd do this stuff in onCreate, but that won't run again if we're retained */
-        // mActivity = (ActionBarActivity) getActivity()
-
         mApi = LuchadeerApi.getInstance(activity.getApplicationContext());
         mPersist = LuchadeerPersist.getInstance(activity.getApplicationContext());
         mPreferences = LuchadeerPreferences.getInstance(activity.getApplicationContext());
@@ -171,7 +168,7 @@ public class VideoListFragment extends ContentListFragment implements
 
         mActionBar = getActivity().getActionBar();
 
-        // overriden
+        // override
         mListView = (ParallaxListView) getListView();
         mSwipeRefreshLayout = getSwipeRefreshLayout();
 
@@ -393,8 +390,7 @@ public class VideoListFragment extends ContentListFragment implements
     public void reloadVideosList() {
         setListShown(false);
         // we clear so that we have the offset we want. The other option was to use setRefreshing
-        mVideos.clear();
-        mOffset = 0;
+        resetVideosList();
         // setRefreshing(true);
         mSwipeRefreshLayout.setEnabled(false);
         getLoaderManager().restartLoader(VIDEOS_LIST_LOADER_ID, null, VideoListFragment.this);
@@ -427,8 +423,7 @@ public class VideoListFragment extends ContentListFragment implements
         mListView.setAvailableItemCount(mTotalResults);
 
         if (isRefreshing()) {
-            mVideos.clear();
-            mOffset = 0;
+            resetVideosList();
         }
 
         mOffset += offset; // videos.size();
@@ -456,6 +451,11 @@ public class VideoListFragment extends ContentListFragment implements
         }
 
         return filtered;
+    }
+
+    private void resetVideosList() {
+        mVideos.clear();
+        mOffset = 0;
     }
 
     private void requestVideoTypes() {
@@ -503,6 +503,7 @@ public class VideoListFragment extends ContentListFragment implements
                     boolean ready = false;
                     @Override
                     public boolean onNavigationItemSelected(int i, long l) {
+                        // handle initial set
                         if (!ready) {
                             ready = true;
                             return true;
@@ -524,8 +525,7 @@ public class VideoListFragment extends ContentListFragment implements
 
                         mVideoArrayAdapter = new VideoArrayAdapter(getActivity());
                         setListAdapter(mVideoArrayAdapter);
-                        mVideos.clear();
-                        mOffset = 0;
+                        resetVideosList();
                         setListShown(false);
 
                         getLoaderManager().restartLoader(VIDEOS_LIST_LOADER_ID, null, VideoListFragment.this);
