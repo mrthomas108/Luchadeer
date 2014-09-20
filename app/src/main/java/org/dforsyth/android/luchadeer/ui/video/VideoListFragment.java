@@ -65,6 +65,7 @@ import org.dforsyth.android.luchadeer.ui.util.ParallaxListView;
 import org.dforsyth.android.luchadeer.util.LoaderListResult;
 import org.dforsyth.android.luchadeer.util.OffsetListLoader;
 import org.dforsyth.android.luchadeer.util.Util;
+import org.dforsyth.android.luchadeer.util.VideoUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -445,7 +446,7 @@ public class VideoListFragment extends ContentListFragment implements
         }
 
         for (Video video : videos) {
-            if (video.getVideoType() != null && !video.getVideoType().equals("Trailers")) {
+            if (video.getVideoType() != null && !video.getVideoType().equals(VideoUtil.VIDEO_TYPE_TRAILERS)) {
                 filtered.add(video);
             }
         }

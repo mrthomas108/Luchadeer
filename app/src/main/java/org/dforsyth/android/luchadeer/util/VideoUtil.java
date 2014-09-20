@@ -49,6 +49,7 @@ public class VideoUtil {
     public static int RESULT_CODE_ERROR = Activity.RESULT_FIRST_USER + 0;
 
     public static final String VIDEO_TYPE_LIVE = "live";
+    public static final String VIDEO_TYPE_TRAILERS = "Trailers";
 
     public static final String VIDEO_SOURCE_HD = "HD";
     public static final String VIDEO_SOURCE_HIGH = "High";
