@@ -121,7 +121,7 @@ public class MainActivity extends BaseActivity implements
             R.string.nav_preferences,
             0,
             R.string.nav_giant_bomb,
-            // R.string.nav_github,
+            R.string.nav_github,
     };
 
     private final static int[] NAV_ICONS = new int[] {
@@ -136,7 +136,7 @@ public class MainActivity extends BaseActivity implements
             R.drawable.ic_action_settings,
             0,
             R.drawable.holo_light_ic_action_web_site,
-            // R.drawable.holo_light_ic_action_web_site,
+            R.drawable.holo_light_ic_action_web_site,
     };
 
 

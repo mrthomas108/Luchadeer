@@ -70,7 +70,7 @@
     </string-array>
 
     <string name="giant_bomb_web_uri">http://www.giantbomb.com</string>
-    <string name="github_web_uri">https://github.com/dforsyth/luchadeer</string>
+    <string name="github_web_uri">https://github.com/dforsyth/Luchadeer</string>
 
     <string name="title_activity_link_subscription">Link Account</string>
     <string name="boxee_text">As a Giant Bomb user, you can find your link code at <a href="http://giantbomb.com/boxee">giantbomb.com/boxee</a></string>
