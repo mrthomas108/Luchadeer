@@ -94,6 +94,8 @@ public class MainActivity extends BaseActivity implements
 
     private static final String STATE_SELECTED_ID = "selected_id";
 
+    private static final int DRAWER_CLOSE_DELAY = 300;
+
     private static final int REQUEST_CODE_ACCOUNT_LINKED = 0;
 
     private final static int NAV_VIDEOS = 0;
@@ -459,6 +461,12 @@ public class MainActivity extends BaseActivity implements
         VideoListFragment videoListFragment = (VideoListFragment) mFragmentManager.findFragmentByTag(VIDEO_LIST_FRAGMENT);
         if (videoListFragment != null) {
             videoListFragment.reloadVideosList();
+            mDrawerLayout.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mDrawerLayout.closeDrawers();
+                }
+            }, DRAWER_CLOSE_DELAY);
         }
     }
 }
