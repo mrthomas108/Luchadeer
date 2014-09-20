@@ -188,4 +188,11 @@ public class LuchadeerPreferences {
     public void clearPreferences() {
         mSharedPreferences.edit().clear().commit();
     }
+
+    public boolean getFilterTrailers() {
+        return mSharedPreferences.getBoolean(
+                mResources.getString(R.string.pref_filter_trailers),
+                false
+        );
+    }
 }

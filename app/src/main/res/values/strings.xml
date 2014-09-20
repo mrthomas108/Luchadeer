@@ -130,6 +130,8 @@
     <string name="pref_share_recent_searches">org.dforsyth.android.giantbomb.preference.share_recent_searches</string>
     <string name="pref_share_viewed_games">org.dforsyth.android.giantbomb.preference.share_viewed_games</string>
 
+    <string name="pref_filter_trailers">org.dforsyth.android.giantbomb.preference.filter_trailers</string>
+
     <string name="giantbomb_request_error">We\'re having some trouble with the Giant Bomb API. Try again soon!</string>
     <string name="subscriber_content_error">Can\'t request subscriber content. Please link your subscriber account an try again.</string>
     <string name="rate_limit_error">Giant Bomb is enforcing its rate limit. Take a break and try again in a few minutes.</string>

@@ -36,17 +36,19 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 
 import org.dforsyth.android.luchadeer.CreditsActivity;
 import org.dforsyth.android.luchadeer.R;
-import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.model.giantbomb.VideoType;
+import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.persist.LuchadeerPreferences;
 import org.dforsyth.android.luchadeer.ui.account.LinkSubscriptionFragment;
 import org.dforsyth.android.luchadeer.ui.account.OnAccountStateChangedListener;
@@ -180,6 +182,30 @@ public class PreferencesFragment extends PreferenceFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mOnAccountStateChangedListener = (OnAccountStateChangedListener) activity;
+    }
+
+    private SharedPreferences.OnSharedPreferenceChangeListener mOnSharedPreferenceChangeListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    if (key.equals(getString(R.string.pref_filter_trailers))) {
+                        mOnAccountStateChangedListener.onAccountStateChanged();
+                    }
+                }
+            };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        PreferenceManager.getDefaultSharedPreferences(getActivity())
+                .registerOnSharedPreferenceChangeListener(mOnSharedPreferenceChangeListener);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        PreferenceManager.getDefaultSharedPreferences(getActivity())
+                .unregisterOnSharedPreferenceChangeListener(mOnSharedPreferenceChangeListener);
     }
 
     public static  class VerifyFragment extends DialogFragment {

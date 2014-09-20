@@ -39,6 +39,13 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Video Preferences">
+        <CheckBoxPreference
+            android:title="Filter trailers"
+            android:key="@string/pref_filter_trailers"
+            android:summary="Remove Trailers from Latest videos list" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="Push Notifications" >
 
         <SwitchPreference

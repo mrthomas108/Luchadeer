@@ -54,6 +54,7 @@ public class Video implements /* Serializable, */ ContentListFragment.GiantBombC
     @SerializedName("publish_date") private Date mPublishDate;
     @SerializedName("site_detail_url") private String mSiteDetailUrl;
     @SerializedName("youtube_id") private String mYouTubeId;
+    @SerializedName("video_type") private String mVideoType;
 
     public String getApiDetailUrl() {
         return mApiDetailUrl;
@@ -127,6 +128,7 @@ public class Video implements /* Serializable, */ ContentListFragment.GiantBombC
         parcel.writeLong(mPublishDate != null ? mPublishDate.getTime() : -1);
         parcel.writeString(mSiteDetailUrl);
         parcel.writeString(mYouTubeId);
+        parcel.writeString(mVideoType);
     }
 
     public static final Parcelable.Creator<Video> CREATOR
@@ -155,5 +157,10 @@ public class Video implements /* Serializable, */ ContentListFragment.GiantBombC
         mPublishDate = date != -1 ? new Date(date) : null;
         mSiteDetailUrl = in.readString();
         mYouTubeId = in.readString();
+        mVideoType = in.readString();
+    }
+
+    public String getVideoType() {
+        return mVideoType;
     }
 }

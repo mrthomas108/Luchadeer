@@ -77,6 +77,7 @@ public class VideoListFragment extends ContentListFragment implements
 
     private ArrayList<VideoType> mVideoTypes;
     private ArrayList<Video> mVideos;
+    private int mOffset;
     private ArrayList<Video> mVideosTmp;
     private int mTotalResults;
 
@@ -172,6 +173,7 @@ public class VideoListFragment extends ContentListFragment implements
         mSwipeRefreshLayout = getSwipeRefreshLayout();
 
         mVideos = new ArrayList<Video>();
+        mOffset = 0;
 
         if (savedInstanceState != null) {
             // load old state
@@ -285,7 +287,7 @@ public class VideoListFragment extends ContentListFragment implements
 
     @Override
     public Loader<LoaderListResult<Video>> onCreateLoader(int i, Bundle bundle) {
-        return new VideosListLoader(getActivity(), isRefreshing() ? 0 : mVideos.size(), mCategoryId);
+        return new VideosListLoader(getActivity(), isRefreshing() ? 0 : mOffset, mCategoryId);
     }
 
     @Override
@@ -387,6 +389,7 @@ public class VideoListFragment extends ContentListFragment implements
         setListShown(false);
         // we clear so that we have the offset we want. The other option was to use setRefreshing
         mVideos.clear();
+        mOffset = 0;
         // setRefreshing(true);
         mSwipeRefreshLayout.setEnabled(false);
         getLoaderManager().restartLoader(VIDEOS_LIST_LOADER_ID, null, VideoListFragment.this);
@@ -420,14 +423,34 @@ public class VideoListFragment extends ContentListFragment implements
 
         if (isRefreshing()) {
             mVideos.clear();
+            mOffset = 0;
         }
-        mVideos.addAll(videos);
+
+        mOffset += videos.size();
+        mVideos.addAll(filterTrailers(videos));
+
         mVideoArrayAdapter.notifyDataSetChanged();
 
         mListView.setLoadingNextPage(false);
         mSwipeRefreshLayout.setEnabled(true);
         setRefreshing(false);
         setListShown(true);
+    }
+
+    private ArrayList<Video> filterTrailers(ArrayList<Video> videos) {
+        ArrayList<Video> filtered = new ArrayList<Video>();
+
+        if (!mPreferences.getFilterTrailers()) {
+            return videos;
+        }
+
+        for (Video video : videos) {
+            if (video.getVideoType() != null && !video.getVideoType().equals("Trailers")) {
+                filtered.add(video);
+            }
+        }
+
+        return filtered;
     }
 
     private void requestVideoTypes() {
