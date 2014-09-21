@@ -277,7 +277,7 @@ public class DownloadsListFragment extends ListFragment implements LoaderManager
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         setListAdapter(null);
-        mAdapter.swapCursor(null);
+        mAdapter.changeCursor(null);
     }
 
     private void setupContextMenu() {

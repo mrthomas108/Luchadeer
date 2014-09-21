@@ -182,7 +182,7 @@ public abstract class FavoritesListFragment extends ListFragment implements
 
     @Override
     public void onLoaderReset(Loader<Cursor> objectLoader) {
-        mAdapter.swapCursor(null);
+        mAdapter.changeCursor(null);
     }
 
     @Override
