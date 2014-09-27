@@ -294,7 +294,7 @@ public class LuchadeerApi {
 
     // this method exists just so that I can late load secret uris
     private void setupURIs() {
-        LUCHADEER_BASE_URL = mContext.getString(R.string.unlinked_base_uri);
+        LUCHADEER_BASE_URL = mContext.getString(R.string.luchadeer_base_uri);
         UNLINKED_BASE_URL = LUCHADEER_BASE_URL + "/giantbomb";
     }
 

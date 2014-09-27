@@ -109,7 +109,7 @@
     <!-- SECRETS
     <string name="cast_application_id"></string>
     <string name="gcm_sender_id"></string>
-    <string name="unlinked_base_uri"></string>
+    <string name="luchadeer_base_uri"></string>
     -->
 
     <string name="pref_gcm_registration_id">org.dforsyth.android.giantbomb.preference.gcm_registration_id</string>
