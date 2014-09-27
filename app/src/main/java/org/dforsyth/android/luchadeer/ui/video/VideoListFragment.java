@@ -445,7 +445,7 @@ public class VideoListFragment extends ContentListFragment implements
         }
 
         for (Video video : videos) {
-            if (video.getVideoType() != null && !video.getVideoType().equals(VideoUtil.VIDEO_TYPE_TRAILERS)) {
+            if (video.getVideoType() == null || !video.getVideoType().equals(VideoUtil.VIDEO_TYPE_TRAILERS)) {
                 filtered.add(video);
             }
         }
