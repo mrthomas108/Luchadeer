@@ -114,6 +114,7 @@
 
     <string name="pref_gcm_registration_id">org.dforsyth.android.giantbomb.preference.gcm_registration_id</string>
     <string name="pref_gcm_registration_version">org.dforsyth.android.giantbomb.preference.gcm_registration_version</string>
+    <string name="pref_gcm_registration_time">org.dforsyth.android.giantbomb.preference.gcm_registration_time</string>
 
     <string name="pref_api_key">org.dforsyth.android.giantbomb.preference.api_key</string>
 

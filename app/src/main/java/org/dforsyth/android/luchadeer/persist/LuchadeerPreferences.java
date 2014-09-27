@@ -155,6 +155,20 @@ public class LuchadeerPreferences {
                 version).commit();
     }
 
+    public void setGCMRegistrationTime(long time) {
+        mSharedPreferences.edit().putLong(
+                mResources.getString(R.string.pref_gcm_registration_time),
+                time
+        ).commit();
+    }
+
+    public long getGCMRegistrationTime() {
+        return mSharedPreferences.getLong(
+                mResources.getString(R.string.pref_gcm_registration_time),
+                0
+        );
+    }
+
     public Preferences forUpload() {
         return new Preferences(
                 getGCMRegistrationId(),

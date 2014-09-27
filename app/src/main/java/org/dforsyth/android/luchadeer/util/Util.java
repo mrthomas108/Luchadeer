@@ -55,12 +55,14 @@ import org.dforsyth.android.luchadeer.service.PreferenceSyncService;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 
 public class Util {
 
     private final static String TAG = Util.class.getName();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private final static int GCM_REREGISTER_DAYS = 7;
 
     public static boolean postDelayed(Handler handler, Runnable runnable, Object token, int delayMillis) {
         return handler.postAtTime(runnable, token, SystemClock.uptimeMillis() + delayMillis);
@@ -96,10 +98,13 @@ public class Util {
         LuchadeerPreferences preferences = LuchadeerPreferences.getInstance(context);
         String gcmRegistrationId = preferences.getGCMRegistrationId();
         int registeredAppVersion = preferences.getGCMRegistrationVersion();
+        long registrationTime = preferences.getGCMRegistrationTime();
+
+        long registrationDelta = System.currentTimeMillis() - registrationTime;
 
         int appVersion = getApplicationVersion(context);
 
-        if (gcmRegistrationId == null || registeredAppVersion != appVersion) {
+        if (gcmRegistrationId == null || registeredAppVersion != appVersion || TimeUnit.MILLISECONDS.toDays(registrationDelta) > GCM_REREGISTER_DAYS) {
             registerGCM(context);
         }
     }
@@ -136,6 +141,7 @@ public class Util {
                 LuchadeerPreferences preferences = LuchadeerPreferences.getInstance(context);
                 preferences.setGCMRegistrationId(registrationId);
                 preferences.setGCMRegistrationVersion(getApplicationVersion(context));
+                preferences.setGCMRegistrationTime(System.currentTimeMillis());
 
                 // start preference sync service
                 context.startService(new Intent(context, PreferenceSyncService.class));
