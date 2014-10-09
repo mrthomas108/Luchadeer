@@ -85,6 +85,7 @@ public class VideoListFragment extends ContentListFragment implements
 
     private VideoArrayAdapter mVideoArrayAdapter;
     private String mCategoryId;
+    private String mCategoryName;
     private ParallaxListView mListView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -103,6 +104,7 @@ public class VideoListFragment extends ContentListFragment implements
     private static final String STATE_VIDEOS = "videos";
     private static final String STATE_TOTAL_RESULTS = "total_results";
     private static final String STATE_CATEGORY_ID = "category_id";
+    private static final String STATE_CATEGORY_NAME = "category_name";
     private static final String STATE_OFFSET = "offset";
 
     private static final int VIDEOS_LIST_LOADER_ID = 1;
@@ -183,6 +185,7 @@ public class VideoListFragment extends ContentListFragment implements
             mVideosTmp = savedInstanceState.getParcelableArrayList(STATE_VIDEOS);
             mTotalResults = savedInstanceState.getInt(STATE_TOTAL_RESULTS);
             mCategoryId = savedInstanceState.getString(STATE_CATEGORY_ID);
+            mCategoryName = savedInstanceState.getString(STATE_CATEGORY_NAME);
             mOffsetTmp = savedInstanceState.getInt(STATE_OFFSET);
         }
 
@@ -230,6 +233,7 @@ public class VideoListFragment extends ContentListFragment implements
         outState.putParcelableArrayList(STATE_VIDEOS, mVideos);
         outState.putInt(STATE_TOTAL_RESULTS, mTotalResults);
         outState.putString(STATE_CATEGORY_ID, mCategoryId);
+        outState.putString(STATE_CATEGORY_NAME, mCategoryName);
         outState.putInt(STATE_OFFSET, mOffset);
     }
 
@@ -440,6 +444,10 @@ public class VideoListFragment extends ContentListFragment implements
     private ArrayList<Video> filterTrailers(ArrayList<Video> videos) {
         ArrayList<Video> filtered = new ArrayList<Video>();
 
+        if (mCategoryName != null && mCategoryName.equals(VideoUtil.VIDEO_TYPE_TRAILERS)) {
+            return videos;
+        }
+
         if (!mPreferences.getFilterTrailers()) {
             return videos;
         }
@@ -477,6 +485,7 @@ public class VideoListFragment extends ContentListFragment implements
 
     private void onRequestVideoTypesFailed() {
         mCategoryId = null;
+        mCategoryName = null;
         getLoaderManager().initLoader(VIDEOS_LIST_LOADER_ID, null, this);
     }
 
@@ -509,19 +518,25 @@ public class VideoListFragment extends ContentListFragment implements
                             return true;
                         }
 
-                        String selected;
+                        VideoType selectedType;
                         if (i != 0) {
-                            selected = mVideoTypes.get(i - 1).getId();
+                            selectedType = mVideoTypes.get(i - 1);
                         } else {
-                            selected = null;
+                            // latest
+                            selectedType = null;
                         }
 
-                        if ((selected == null && mCategoryId == null) || (selected != null && selected.equals(mCategoryId))) {
+                        if ((selectedType == null && mCategoryId == null) || (selectedType != null && selectedType.getId().equals(mCategoryId))) {
                             return true;
                         }
 
-                        Log.d(TAG, "old: " + mCategoryId + " new: " + selected);
-                        mCategoryId = selected;
+                        if (selectedType != null) {
+                            mCategoryId = selectedType.getId();
+                            mCategoryName = selectedType.getName();
+                        } else {
+                            mCategoryId = null;
+                            mCategoryName = null;
+                        }
 
                         mVideoArrayAdapter = new VideoArrayAdapter(getActivity());
                         setListAdapter(mVideoArrayAdapter);
