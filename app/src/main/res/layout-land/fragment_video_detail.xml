@@ -87,14 +87,16 @@
                         android:textSize="@dimen/abc_action_bar_subtitle_text_size">
                     </TextView>
 
-                    <View style="@style/vertical_divider" android:layout_marginLeft="10dp" android:layout_marginRight="10dp"/>
+                    <FrameLayout android:id="@+id/video_length_section" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                        <View style="@style/vertical_divider" android:layout_marginLeft="10dp" android:layout_marginRight="10dp"/>
 
-                    <TextView
-                        android:id="@+id/video_length_seconds"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="@dimen/abc_action_bar_subtitle_text_size">
-                    </TextView>
+                        <TextView
+                            android:id="@+id/video_length_seconds"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/abc_action_bar_subtitle_text_size">
+                        </TextView>
+                    </FrameLayout>
                 </LinearLayout>
 
             </LinearLayout>

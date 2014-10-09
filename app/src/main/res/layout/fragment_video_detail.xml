@@ -72,11 +72,13 @@
                             android:textSize="@dimen/large_text_size"/>
 
 
-                        <TextView
-                            style="@style/vertical_padded"
-                            android:id="@+id/video_length_seconds"
-                            android:textSize="@dimen/normal_text_size"
-                            android:textColor="@color/text_grey"/>
+                        <FrameLayout android:id="@+id/video_length_section" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                            <TextView
+                                style="@style/vertical_padded"
+                                android:id="@+id/video_length_seconds"
+                                android:textSize="@dimen/normal_text_size"
+                                android:textColor="@color/text_grey"/>
+                        </FrameLayout>
 
 
                     </LinearLayout>

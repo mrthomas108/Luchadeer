@@ -63,6 +63,7 @@ import org.dforsyth.android.luchadeer.model.giantbomb.SearchResult;
 import org.dforsyth.android.luchadeer.model.giantbomb.Video;
 import org.dforsyth.android.luchadeer.model.giantbomb.VideoType;
 import org.dforsyth.android.luchadeer.model.luchadeer.Preferences;
+import org.dforsyth.android.luchadeer.model.youtube.YouTubeVideo;
 import org.dforsyth.android.luchadeer.persist.LuchadeerPreferences;
 
 import java.io.UnsupportedEncodingException;
@@ -118,10 +119,15 @@ public class LuchadeerApi {
 
         public GsonRequest(int method, String url, TypeToken<T> clazz, Response.Listener<T> listener,
                            Response.ErrorListener errorListener) {
+            this(method, url, clazz, listener, errorListener, "yyyy-MM-dd HH:mm:ss");
+        }
+
+        public GsonRequest(int method, String url, TypeToken<T> clazz, Response.Listener<T> listener,
+                           Response.ErrorListener errorListener, String dateFormat) {
             super(method, url, errorListener);
             mClazz = clazz.getType();
             mListener = listener;
-            mGson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            mGson = new GsonBuilder().setDateFormat(dateFormat).create();
         }
 
         public Gson getGson() {
@@ -139,6 +145,7 @@ public class LuchadeerApi {
 
             try {
                 String json = new String(networkResponse.data, HttpHeaderParser.parseCharset(networkResponse.headers));
+                // Log.d(TAG, json);
                 return Response.success((T)mGson.fromJson(json, mClazz), HttpHeaderParser.parseCacheHeaders(networkResponse));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
@@ -523,5 +530,63 @@ public class LuchadeerApi {
         mRequestQueue.add(request);
 
         return future;
+    }
+
+    public class YouTubeListResponse {
+        @SerializedName("items") private ArrayList<YouTubeVideo> mItems;
+        @SerializedName("nextPageToken") private String mNextPageToken;
+        @SerializedName("pageInfo") private PageInfo mPageInfo;
+
+        public String getNextPageToken() {
+            return mNextPageToken;
+        }
+
+        public PageInfo getPageInfo() {
+            return mPageInfo;
+        }
+
+        public class PageInfo {
+            @SerializedName("totalResults") private int mTotalResults;
+
+            public int getTotalResults() {
+                return mTotalResults;
+            }
+        }
+
+        public ArrayList<YouTubeVideo> getItems() {
+            return mItems;
+        }
+    }
+
+    public void unarchivedVideos(
+            Object tag,
+            Response.Listener<YouTubeListResponse> listener,
+            Response.ErrorListener errorListener,
+            String nextPageToken,
+            String query) {
+
+        Uri.Builder builder = Uri.parse(LUCHADEER_BASE_URL).buildUpon()
+                .appendPath("youtube")
+                .appendPath("unarchived_videos");
+
+        if (nextPageToken != null) {
+            builder.appendQueryParameter("pageToken", nextPageToken);
+        }
+        if (query != null) {
+            builder.appendQueryParameter("q", query);
+        }
+        String uri = builder.build().toString();
+
+        Request<YouTubeListResponse> r = new GsonRequest<YouTubeListResponse>(
+                Request.Method.GET,
+                uri,
+                new TypeToken<YouTubeListResponse>(){},
+                listener,
+                errorListener,
+                "yyyy-MM-dd'T'HH:mm:ss'.000Z'"
+        );
+        r.setTag(tag);
+
+        mRequestQueue.add(r);
     }
 }

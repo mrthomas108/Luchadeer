@@ -26,5 +26,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:5.0.+'
     compile 'com.android.support:mediarouter-v7:20.0.+'
     compile 'com.android.support:support-v13:20.+'
-    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.google.code.gson:gson:2.3'
 }

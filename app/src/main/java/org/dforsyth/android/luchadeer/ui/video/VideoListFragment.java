@@ -562,7 +562,7 @@ public class VideoListFragment extends ContentListFragment implements
     }
 
     public interface OnVideoSelectedListener {
-        public void onVideoSelected(Video mVideo);
+        public void onVideoSelected(Video video);
     }
 
     public void setOnVideoSelectedListener(OnVideoSelectedListener onVideoSelectedListener) {

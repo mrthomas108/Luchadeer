@@ -147,6 +147,14 @@ public class CreditsActivity extends BaseActivity {
                     }
             ),
             new AboutInfo(
+                    "Giant Bomb Unarchived",
+                    "The Giant Bomb Unarchived contributors",
+                    null,
+                    new String[] {
+                            "https://www.youtube.com/user/giantbombunarchived"
+                    }
+            ),
+            new AboutInfo(
                     "Volley",
                     "Google Inc.",
                     "2014",

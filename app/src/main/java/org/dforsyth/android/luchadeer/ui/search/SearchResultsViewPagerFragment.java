@@ -51,28 +51,29 @@ import com.android.volley.toolbox.RequestFuture;
 
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.SearchActivity;
-import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.model.giantbomb.SearchResult;
+import org.dforsyth.android.luchadeer.model.youtube.YouTubeVideo;
+import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.util.LoaderListResult;
+import org.dforsyth.android.luchadeer.util.LoaderResult;
 import org.dforsyth.android.luchadeer.util.Util;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-/**
- * Created by dforsyth on 7/24/14.
- */
+
 public class SearchResultsViewPagerFragment extends Fragment implements
         SearchActivity.OnSearchQueryUpdatedListener,
-        ViewPager.OnPageChangeListener,
-        LoaderManager.LoaderCallbacks<LoaderListResult<SearchResult>> {
+        ViewPager.OnPageChangeListener {
     private static final String TAG = SearchResultsViewPagerFragment.class.getName();
 
     private static final String ARG_QUERY = "query";
     private static final String STATE_QUERY = "query";
     private static final String STATE_SEARCH_RESULTS = "search_results";
+    private static final String STATE_YOUTUBE_RESULTS = "youtube_results";
 
     private static final int SEARCH_RESULTS_LOADER_ID = 3;
+    private static final int YOUTUBE_RESULTS_LOADER_ID = 4;
 
     private Activity mActivity;
     private ActionBar mActionBar;
@@ -84,10 +85,14 @@ public class SearchResultsViewPagerFragment extends Fragment implements
     private ArrayList<SearchResult> mResults;
     private ArrayList<SearchResult> mGameResults;
     private ArrayList<SearchResult> mVideoResults;
+    private ArrayList<YouTubeVideo> mYouTubeVideos;
 
     private static final String RESOURCE_TYPE_GAME = "game";
     private static final String RESOURCE_TYPE_VIDEO = "video";
     private static final String[] SEARCH_RESOURCE_TYPES = new String[]{RESOURCE_TYPE_GAME, RESOURCE_TYPE_VIDEO};
+
+    private final YouTubeSearchLoaderCallbacks mYouTubeCallbacks = new YouTubeSearchLoaderCallbacks();
+    private final GiantBombSearchLoaderCallbacks mGiantBombCallbacks = new GiantBombSearchLoaderCallbacks();
 
     public SearchResultsViewPagerFragment() {
 
@@ -166,10 +171,16 @@ public class SearchResultsViewPagerFragment extends Fragment implements
                 mActionBar.newTab()
                         .setText(getString(R.string.tab_games))
                         .setTabListener(new SearchResultsTabListener(mViewPager, 1)));
-
+        mActionBar.addTab(
+                mActionBar.newTab()
+                        .setText(getString(R.string.tab_unarchived))
+                        .setTabListener(new SearchResultsTabListener(mViewPager, 2)));
 
         mViewPager.setOnPageChangeListener(this);
         mViewPager.setAdapter(new PagerAdapter(getChildFragmentManager()));
+
+        // XXX we need to do this because, frankly, this implementation is bad.
+        mViewPager.setOffscreenPageLimit(3);
 
         return rootView;
     }
@@ -178,14 +189,19 @@ public class SearchResultsViewPagerFragment extends Fragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d(TAG, "onviewcreated");
-        String query = null;
+        // String query = null;
         if (savedInstanceState != null) {
-            query = savedInstanceState.getString(STATE_QUERY);
+            // query = savedInstanceState.getString(STATE_QUERY);
             mResults = savedInstanceState.getParcelableArrayList(STATE_SEARCH_RESULTS);
+            mYouTubeVideos = savedInstanceState.getParcelableArrayList(STATE_YOUTUBE_RESULTS);
         }
         // we need results
         if (mResults == null) {
-            getLoaderManager().initLoader(SEARCH_RESULTS_LOADER_ID, null, this);
+            getLoaderManager().initLoader(SEARCH_RESULTS_LOADER_ID, null, mGiantBombCallbacks);
+        }
+
+        if (mYouTubeVideos == null) {
+            getLoaderManager().initLoader(YOUTUBE_RESULTS_LOADER_ID, null, mYouTubeCallbacks);
         }
     }
 
@@ -194,6 +210,7 @@ public class SearchResultsViewPagerFragment extends Fragment implements
         super.onSaveInstanceState(outState);
         outState.putString(STATE_QUERY, mQuery);
         outState.putParcelableArrayList(STATE_SEARCH_RESULTS, mResults);
+        outState.putParcelableArrayList(STATE_YOUTUBE_RESULTS, mYouTubeVideos);
     }
 
     @Override
@@ -209,7 +226,8 @@ public class SearchResultsViewPagerFragment extends Fragment implements
         mResults = null;
         hideResultLists();
         Log.d(TAG, "calling restart loader");
-        getLoaderManager().restartLoader(SEARCH_RESULTS_LOADER_ID, null, this);
+        getLoaderManager().restartLoader(SEARCH_RESULTS_LOADER_ID, null, mGiantBombCallbacks);
+        getLoaderManager().restartLoader(YOUTUBE_RESULTS_LOADER_ID, null, mYouTubeCallbacks);
     }
 
     private class PagerAdapter extends FragmentPagerAdapter {
@@ -228,14 +246,17 @@ public class SearchResultsViewPagerFragment extends Fragment implements
                 return VideoSearchResultsListFragment.newInstance(mVideoResults);
             case (1):
                 return GameSearchResultListFragment.newInstance(mGameResults);
+            case (2):
+                return UnarchivedSearchResultsListFragment.newInstance(mYouTubeVideos);
             default:
             }
+
             return null;
         }
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         public Fragment getFragmentAtPosition(int position) {
@@ -260,6 +281,7 @@ public class SearchResultsViewPagerFragment extends Fragment implements
         }
 
         PagerAdapter adapter = (PagerAdapter) mViewPager.getAdapter();
+
         SearchResultListFragment fragment;
         fragment = (SearchResultListFragment) adapter.getFragmentAtPosition(0);
         if (fragment != null) {
@@ -278,16 +300,13 @@ public class SearchResultsViewPagerFragment extends Fragment implements
     private void hideResultLists() {
         PagerAdapter adapter = (PagerAdapter) mViewPager.getAdapter();
         SearchResultListFragment fragment;
-        fragment = (SearchResultListFragment) adapter.getFragmentAtPosition(0);
-        if (fragment != null) {
-            if (fragment.getView() != null) {
-                fragment.clearResults();
-            }
-        }
-        fragment = (SearchResultListFragment) adapter.getFragmentAtPosition(1);
-        if (fragment != null) {
-            if (fragment.getView() != null) {
-                fragment.clearResults();
+
+        for (int i = 0; i < 3; ++i) {
+            fragment = (SearchResultListFragment) adapter.getFragmentAtPosition(i);
+            if (fragment != null) {
+                if (fragment.getView() != null) {
+                    fragment.clearResults();;
+                }
             }
         }
     }
@@ -350,29 +369,121 @@ public class SearchResultsViewPagerFragment extends Fragment implements
         }
     }
 
+    private class GiantBombSearchLoaderCallbacks implements LoaderManager.LoaderCallbacks<LoaderListResult<SearchResult>> {
 
-    @Override
-    public Loader<LoaderListResult<SearchResult>> onCreateLoader(int i, Bundle bundle) {
-        Log.d(TAG, "oncCreateLoader");
-        return new SearchResultsLoader(getActivity(), mQuery);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<LoaderListResult<SearchResult>> loader, LoaderListResult<SearchResult> result) {
-        ArrayList<SearchResult> searchResults = result.getResult();
-        Exception error = result.getError();
-
-        if (searchResults != null) {
-            onSearchResultsRequestCompleted(searchResults);
-        } else {
-            Util.handleVolleyError(getActivity(), error);
-            onSearchResultsRequestFailed();
+        @Override
+        public Loader<LoaderListResult<SearchResult>> onCreateLoader(int i, Bundle bundle) {
+            return new SearchResultsLoader(getActivity(), mQuery);
         }
-        getLoaderManager().destroyLoader(SEARCH_RESULTS_LOADER_ID);
+
+        @Override
+        public void onLoadFinished(Loader<LoaderListResult<SearchResult>> loaderListResultLoader, LoaderListResult<SearchResult> result) {
+            ArrayList<SearchResult> searchResults = result.getResult();
+            Exception error = result.getError();
+
+            if (searchResults != null) {
+                onSearchResultsRequestCompleted(searchResults);
+            } else {
+                Util.handleVolleyError(getActivity(), error);
+                onSearchResultsRequestFailed();
+            }
+            getLoaderManager().destroyLoader(SEARCH_RESULTS_LOADER_ID);
+            getLoaderManager().destroyLoader(YOUTUBE_RESULTS_LOADER_ID);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<LoaderListResult<SearchResult>> loaderListResultLoader) {
+
+        }
     }
 
-    @Override
-    public void onLoaderReset(Loader<LoaderListResult<SearchResult>> loader) {
+    public void onYoutubeSearchComplete(ArrayList<YouTubeVideo> results) {
+        mYouTubeVideos = results;
+
+        PagerAdapter adapter = (PagerAdapter) mViewPager.getAdapter();
+
+        SearchResultListFragment fragment = (SearchResultListFragment) adapter.getFragmentAtPosition(2);
+        if (fragment != null) {
+            fragment.setSearchResults(results);
+        }
+
+        Log.d(TAG, "ytube results: " + results.size());
     }
 
+    private static class YouTubeLoader extends AsyncTaskLoader<LoaderResult<LuchadeerApi.YouTubeListResponse>> {
+        private String mQuery;
+        private LoaderResult<LuchadeerApi.YouTubeListResponse> mResults;
+
+        public YouTubeLoader(Context context, String query) {
+            super(context);
+            mQuery = query;
+        }
+
+        @Override
+        public LoaderResult<LuchadeerApi.YouTubeListResponse> loadInBackground() {
+            RequestFuture<LuchadeerApi.YouTubeListResponse> future = RequestFuture.newFuture();
+
+            LuchadeerApi api = LuchadeerApi.getInstance(null);
+
+            api.unarchivedVideos(this, future, future, null, mQuery);
+
+            LuchadeerApi.YouTubeListResponse response = null;
+            Exception error = null;
+            try {
+                response = future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                error = e;
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                error = e;
+            }
+
+            return new LoaderResult<LuchadeerApi.YouTubeListResponse>(response == null ? null : response, error);
+        }
+
+        @Override
+        public void deliverResult(LoaderResult<LuchadeerApi.YouTubeListResponse> result) {
+            if (isReset()) {
+                return;
+            }
+            mResults = result;
+            if (isStarted()) {
+                super.deliverResult(result);
+            }
+        }
+
+        @Override
+        protected void onStartLoading() {
+            if (mResults != null) {
+                deliverResult(mResults);
+            } else {
+                forceLoad();
+            }
+        }
+
+        @Override
+        protected void onStopLoading() {
+            super.onStopLoading();
+            cancelLoad();
+        }
+    }
+
+    private class YouTubeSearchLoaderCallbacks implements LoaderManager.LoaderCallbacks<LoaderResult<LuchadeerApi.YouTubeListResponse>> {
+
+        @Override
+        public Loader<LoaderResult<LuchadeerApi.YouTubeListResponse>> onCreateLoader(int i, Bundle bundle) {
+            return new YouTubeLoader(getActivity(), mQuery);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<LoaderResult<LuchadeerApi.YouTubeListResponse>> loaderResultLoader, LoaderResult<LuchadeerApi.YouTubeListResponse> youTubeListResponseLoaderResult) {
+            onYoutubeSearchComplete(youTubeListResponseLoaderResult.getResult().getItems());
+        }
+
+        @Override
+        public void onLoaderReset(Loader<LoaderResult<LuchadeerApi.YouTubeListResponse>> loaderResultLoader) {
+
+        }
+    }
 }

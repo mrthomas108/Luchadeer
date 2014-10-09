@@ -32,6 +32,7 @@ package org.dforsyth.android.luchadeer.ui.search;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,26 +44,22 @@ import android.widget.TextView;
 
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.net.LuchadeerApi;
-import org.dforsyth.android.luchadeer.model.giantbomb.Image;
-import org.dforsyth.android.luchadeer.model.giantbomb.SearchResult;
+import org.dforsyth.android.luchadeer.ui.util.ContentListFragment;
 import org.dforsyth.android.luchadeer.ui.util.FadeNetworkImageView;
 
 import java.util.ArrayList;
 
-/**
- * Created by dforsyth on 7/25/14.
- */
-public abstract class SearchResultListFragment extends ListFragment {
+public abstract class SearchResultListFragment<T extends ContentListFragment.Content & Parcelable> extends ListFragment {
     private static final String TAG = SearchResultListFragment.class.getName();
 
     protected static final String ARG_RESULTS = "results";
     private static final String STATE_RESULTS = "results";
 
     private LuchadeerApi mApi;
-    private ArrayList<SearchResult> mResults;
+    private ArrayList<T> mResults;
     private ResultAdapter mAdapter;
 
-    public void setSearchResults(ArrayList<SearchResult> results) {
+    public void setSearchResults(ArrayList<T> results) {
         Log.d(TAG, "setting results");
 
         if (results == null) {
@@ -110,7 +107,7 @@ public abstract class SearchResultListFragment extends ListFragment {
         super.onViewCreated(view, savedInstanceState);
         setEmptyText("No results");
 
-        ArrayList<SearchResult> results;
+        ArrayList<T> results;
         if (savedInstanceState == null) {
             results = getArguments().getParcelableArrayList(ARG_RESULTS);
         } else {
@@ -125,7 +122,7 @@ public abstract class SearchResultListFragment extends ListFragment {
         outState.putParcelableArrayList(STATE_RESULTS, mResults);
     }
 
-    private class ResultAdapter extends ArrayAdapter<SearchResult> {
+    private class ResultAdapter extends ArrayAdapter<ContentListFragment.Content> {
 
         private LayoutInflater mInflater;
 
@@ -143,22 +140,22 @@ public abstract class SearchResultListFragment extends ListFragment {
             TextView t = (TextView) convertView.findViewById(R.id.result_name);
             FadeNetworkImageView iv = (FadeNetworkImageView) convertView.findViewById(R.id.result_image);
 
-            SearchResult result = getItem(position);
+            ContentListFragment.Content result = getItem(position);
 
             t.setText(result.getName());
 
-            Image i = result.getImage();
-            if (i != null) {
-                iv.setImageUrl(i.getSuperUrl(), mApi.getImageLoader());
-            } else {
+            String imageUrl = result.getImageUrl();
+            if (imageUrl == null) {
                 iv.setImageUrl(null, null);
+            } else {
+                iv.setImageUrl(imageUrl, mApi.getImageLoader());
             }
 
             return convertView;
         }
 
         @Override
-        public SearchResult getItem(int position) {
+        public ContentListFragment.Content getItem(int position) {
             return mResults.get(position);
         }
 

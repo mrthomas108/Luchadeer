@@ -30,28 +30,24 @@
 
 package org.dforsyth.android.luchadeer.ui.search;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 
-import org.dforsyth.android.luchadeer.model.giantbomb.SearchResult;
-import org.dforsyth.android.luchadeer.util.IntentUtil;
+import org.dforsyth.android.luchadeer.UnarchivedDetailActivity;
+import org.dforsyth.android.luchadeer.model.youtube.YouTubeVideo;
 
 import java.util.ArrayList;
 
+public class UnarchivedSearchResultsListFragment extends SearchResultListFragment {
 
-public class VideoSearchResultsListFragment extends SearchResultListFragment<SearchResult> {
-    private final static String TAG = VideoSearchResultsListFragment.class.getName();
-
-    public VideoSearchResultsListFragment() {
-
-    }
-
-    public static VideoSearchResultsListFragment newInstance(ArrayList<SearchResult> results) {
-        VideoSearchResultsListFragment fragment = new VideoSearchResultsListFragment();
+    public static UnarchivedSearchResultsListFragment newInstance(ArrayList<YouTubeVideo> initial) {
+        UnarchivedSearchResultsListFragment fragment = new UnarchivedSearchResultsListFragment();
 
         Bundle args = new Bundle();
-        args.putSerializable(SearchResultListFragment.ARG_RESULTS, results);
+        args.putParcelableArrayList(ARG_RESULTS, initial);
+
         fragment.setArguments(args);
 
         return fragment;
@@ -59,7 +55,10 @@ public class VideoSearchResultsListFragment extends SearchResultListFragment<Sea
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        SearchResult result = (SearchResult) getListAdapter().getItem(position);
-        startActivity(IntentUtil.getVideoDetailActivityIntent(getActivity(), result.getId()));
+        YouTubeVideo video = (YouTubeVideo) getListAdapter().getItem(position);
+
+        Intent intent = new Intent(getActivity(), UnarchivedDetailActivity.class);
+        intent.putExtra(UnarchivedDetailActivity.EXTRA_YOUTUBE_VIDEO, video);
+        startActivity(intent);
     }
 }

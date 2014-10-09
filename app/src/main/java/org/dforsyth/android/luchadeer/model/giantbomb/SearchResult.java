@@ -35,10 +35,12 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.dforsyth.android.luchadeer.ui.util.ContentListFragment;
+
 import java.io.Serializable;
 
 
-public class SearchResult implements Serializable, Parcelable {
+public class SearchResult implements ContentListFragment.Content, Serializable, Parcelable {
     @SerializedName("id") private int mId;
     @SerializedName("resource_type") private String mResourceType;
     @SerializedName("name") private String mName;
@@ -50,6 +52,15 @@ public class SearchResult implements Serializable, Parcelable {
 
     public String getName() {
         return mName;
+    }
+
+    @Override
+    public String getImageUrl() {
+        if (mImage == null) {
+            return null;
+        }
+
+        return mImage.getSuperUrl();
     }
 
     public Image getImage() {

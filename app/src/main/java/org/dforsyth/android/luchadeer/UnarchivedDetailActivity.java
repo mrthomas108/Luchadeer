@@ -28,38 +28,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.dforsyth.android.luchadeer.ui.search;
+package org.dforsyth.android.luchadeer;
 
+import android.app.ActionBar;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ListView;
 
-import org.dforsyth.android.luchadeer.model.giantbomb.SearchResult;
-import org.dforsyth.android.luchadeer.util.IntentUtil;
+import org.dforsyth.android.luchadeer.model.youtube.YouTubeVideo;
+import org.dforsyth.android.luchadeer.ui.unarchived.UnarchivedDetailFragment;
 
-import java.util.ArrayList;
+public class UnarchivedDetailActivity extends BaseActivity {
 
-
-public class VideoSearchResultsListFragment extends SearchResultListFragment<SearchResult> {
-    private final static String TAG = VideoSearchResultsListFragment.class.getName();
-
-    public VideoSearchResultsListFragment() {
-
-    }
-
-    public static VideoSearchResultsListFragment newInstance(ArrayList<SearchResult> results) {
-        VideoSearchResultsListFragment fragment = new VideoSearchResultsListFragment();
-
-        Bundle args = new Bundle();
-        args.putSerializable(SearchResultListFragment.ARG_RESULTS, results);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
+    public static final String EXTRA_YOUTUBE_VIDEO = "youtube_video";
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        SearchResult result = (SearchResult) getListAdapter().getItem(position);
-        startActivity(IntentUtil.getVideoDetailActivityIntent(getActivity(), result.getId()));
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_container_with_minicontroller);
+        if (savedInstanceState == null) {
+            YouTubeVideo video = getIntent().getParcelableExtra(EXTRA_YOUTUBE_VIDEO);
+
+            getFragmentManager().beginTransaction()
+                    .add(R.id.container, UnarchivedDetailFragment.newInstance(video))
+                    .commit();
+        }
+
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(false);
     }
 }

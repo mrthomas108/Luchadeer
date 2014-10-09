@@ -62,6 +62,11 @@
             android:theme="@style/TransparentAppCompatTheme" />
 
         <activity
+            android:name="org.dforsyth.android.luchadeer.UnarchivedDetailActivity"
+            android:label="@string/app_name"
+            android:theme="@style/TransparentAppCompatTheme" />
+
+        <activity
             android:name="org.dforsyth.android.luchadeer.SearchActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"

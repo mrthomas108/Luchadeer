@@ -39,9 +39,7 @@ import org.dforsyth.android.luchadeer.util.IntentUtil;
 
 import java.util.ArrayList;
 
-/**
- * Created by dforsyth on 7/25/14.
- */
+
 public class GameSearchResultListFragment extends SearchResultListFragment {
     private static final String TAG = GameSearchResultListFragment.class.getName();
 

@@ -30,7 +30,6 @@
 
 package org.dforsyth.android.luchadeer.ui.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -45,7 +44,6 @@ import com.android.volley.toolbox.NetworkImageView;
 
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.net.LuchadeerApi;
-import org.dforsyth.android.luchadeer.model.giantbomb.Image;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -60,8 +58,6 @@ public abstract class ContentListFragment extends SwipeRefreshListFragment {
 
     private ParallaxListView mListView;
     private LinearLayout mLoadingView;
-
-    private LuchadeerApi mApi;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -94,16 +90,9 @@ public abstract class ContentListFragment extends SwipeRefreshListFragment {
         mListView.setLoadingBoundary(LOADING_NEXT_PAGE_BOUNDARY);
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        mApi = LuchadeerApi.getInstance(activity.getApplicationContext());
-    }
-
-    public interface GiantBombContent {
+    public interface Content {
         public String getName();
-        public Image getImage();
+        public String getImageUrl();
     }
 
     public static class ContentViewHolder {
@@ -112,15 +101,17 @@ public abstract class ContentListFragment extends SwipeRefreshListFragment {
         public ConcurrentMap<String, View> extraViews = new ConcurrentHashMap<String, View>();
     }
 
-    public class ContentListAdapter<T extends GiantBombContent> extends ArrayAdapter<T> {
+    public class ContentListAdapter<T extends Content> extends ArrayAdapter<T> {
 
         private LayoutInflater mLayoutInflater;
         private int mResource;
+        private LuchadeerApi mApi;
 
         public ContentListAdapter(Context context, int resource) {
             super(context, 0);
             mResource = resource;
             mLayoutInflater = LayoutInflater.from(getActivity());
+            mApi = LuchadeerApi.getInstance(context.getApplicationContext());
         }
 
         @Override
@@ -149,13 +140,13 @@ public abstract class ContentListFragment extends SwipeRefreshListFragment {
                 holder = (ContentViewHolder) convertView.getTag();
             }
 
-            GiantBombContent content = getItem(position);
+            Content content = getItem(position);
 
             holder.name.setText(content.getName());
 
-            Image image = content.getImage();
-            if (image != null) {
-                holder.image.setImageUrl(image.getSuperUrl(), mApi.getImageLoader());
+            String imageUrl = content.getImageUrl();
+            if (imageUrl != null) {
+                holder.image.setImageUrl(imageUrl, mApi.getImageLoader());
             } else {
                 holder.image.setImageUrl(null, null);
             }

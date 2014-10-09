@@ -40,7 +40,7 @@ import org.dforsyth.android.luchadeer.ui.util.ContentListFragment;
 import java.util.Date;
 
 
-public class Video implements /* Serializable, */ ContentListFragment.GiantBombContent, Parcelable {
+public class Video implements /* Serializable, */ ContentListFragment.Content, Parcelable {
     @SerializedName("id") private int mId;
     @SerializedName("api_detail_url") private String mApiDetailUrl;
     @SerializedName("name") private String mName;
@@ -62,6 +62,14 @@ public class Video implements /* Serializable, */ ContentListFragment.GiantBombC
 
     public Image getImage() {
         return mImage;
+    }
+
+    public String getImageUrl() {
+        if (mImage == null) {
+            return null;
+        }
+
+        return mImage.getSuperUrl();
     }
 
     public String getName() {

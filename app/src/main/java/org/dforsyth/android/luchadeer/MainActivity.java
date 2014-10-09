@@ -51,11 +51,13 @@ import android.widget.TextView;
 import com.google.sample.castcompanionlibrary.cast.BaseCastManager;
 
 import org.dforsyth.android.luchadeer.model.giantbomb.Video;
+import org.dforsyth.android.luchadeer.model.youtube.YouTubeVideo;
 import org.dforsyth.android.luchadeer.ui.account.LinkSubscriptionFragment;
 import org.dforsyth.android.luchadeer.ui.account.OnAccountStateChangedListener;
 import org.dforsyth.android.luchadeer.ui.account.UnlinkSubscriptionFragment;
 import org.dforsyth.android.luchadeer.ui.game.GameDetailFragment;
 import org.dforsyth.android.luchadeer.ui.game.GameListFragment;
+import org.dforsyth.android.luchadeer.ui.unarchived.UnarchivedListFragment;
 import org.dforsyth.android.luchadeer.ui.util.UiUtil;
 import org.dforsyth.android.luchadeer.ui.video.VideoDetailFragment;
 import org.dforsyth.android.luchadeer.ui.video.VideoListFragment;
@@ -68,6 +70,7 @@ public class MainActivity extends BaseActivity implements
         GameListFragment.OnGameSelectedListener,
         VideoDetailFragment.OnDetailLoadFailedListener,
         GameDetailFragment.OnDetailLoadFailedListener,
+        UnarchivedListFragment.OnUnarchivedSelectedListener,
         OnAccountStateChangedListener {
 
     private static final String TAG = MainActivity.class.getName();
@@ -88,6 +91,7 @@ public class MainActivity extends BaseActivity implements
 
     private static final String GAME_LIST_FRAGMENT = "game_list_fragment";
     private static final String VIDEO_LIST_FRAGMENT = "video_list_fragment";
+    private static final String UNARCHIVED_LIST_FRAGMENT = "unarchived_list_fragment";
     private static final String LINK_ACCOUNT_FRAGMENT = "link_account_fragment";
     private static final String GAME_DETAIL_FRAGMENT = "game_detail_fragment";
     private static final String VIDEO_DETAIL_FRAGMENT = "video_detail_fragment";
@@ -100,20 +104,23 @@ public class MainActivity extends BaseActivity implements
 
     private final static int NAV_VIDEOS = 0;
     private final static int NAV_GAMES = 1;
-    private final static int NAV_SEARCH = 2;
+    private final static int NAV_UNARCHIVED = 2;
 
-    private final static int NAV_FAVORITES = 4;
-    private final static int NAV_DOWNLOADS = 5;
+    private final static int NAV_SEARCH = 3;
 
-    private final static int NAV_SUBSCRIPTION = 7;
-    private final static int NAV_SETTINGS = 8;
+    private final static int NAV_FAVORITES = 5;
+    private final static int NAV_DOWNLOADS = 6;
 
-    private final static int NAV_GIANTBOMB = 10;
-    private final static int NAV_GITHUB = 11;
+    private final static int NAV_SUBSCRIPTION = 8;
+    private final static int NAV_SETTINGS = 9;
+
+    private final static int NAV_GIANTBOMB = 11;
+    private final static int NAV_GITHUB = 12;
 
     private final static int[] NAV_STRINGS = new int[]{
             R.string.nav_videos,
             R.string.nav_games,
+            R.string.nav_unarchived,
             R.string.nav_search,
             0,
             R.string.nav_favorites,
@@ -129,6 +136,7 @@ public class MainActivity extends BaseActivity implements
     private final static int[] NAV_ICONS = new int[] {
             R.drawable.ic_action_video,
             R.drawable.ic_action_gamepad,
+            R.drawable.ic_action_video,
             R.drawable.ic_action_search,
             0,
             R.drawable.holo_light_ic_action_important,
@@ -328,7 +336,7 @@ public class MainActivity extends BaseActivity implements
                     break;
                 }
 
-                fragment = mFragmentManager.findFragmentByTag(GAME_DETAIL_FRAGMENT);
+                fragment = mFragmentManager.findFragmentById(R.id.content_list);
                 if (fragment != null) {
                     mFragmentManager.beginTransaction().remove(fragment).commit();
                 }
@@ -343,13 +351,28 @@ public class MainActivity extends BaseActivity implements
                     break;
                 }
 
-                fragment = mFragmentManager.findFragmentByTag(VIDEO_DETAIL_FRAGMENT);
+                fragment = mFragmentManager.findFragmentById(R.id.content_list);
                 if (fragment != null) {
                     mFragmentManager.beginTransaction().remove(fragment).commit();
                 }
 
                 mFragmentManager.beginTransaction()
                         .replace(R.id.content_list, GameListFragment.newInstance(), GAME_LIST_FRAGMENT)
+                        .commit();
+                break;
+            case (NAV_UNARCHIVED):
+                mDrawerLayout.closeDrawers();
+                if (mFragmentManager.findFragmentByTag(UNARCHIVED_LIST_FRAGMENT) != null) {
+                    break;
+                }
+
+                fragment = mFragmentManager.findFragmentById(R.id.content_list);
+                if (fragment != null) {
+                    mFragmentManager.beginTransaction().remove(fragment).commit();
+                }
+
+                mFragmentManager.beginTransaction()
+                        .replace(R.id.content_list, new UnarchivedListFragment(), UNARCHIVED_LIST_FRAGMENT)
                         .commit();
                 break;
             case (NAV_SEARCH):
@@ -468,5 +491,13 @@ public class MainActivity extends BaseActivity implements
                 }
             }, DRAWER_CLOSE_DELAY);
         }
+    }
+
+    @Override
+    public void onUnarchivedSelected(YouTubeVideo video) {
+        // Toast.makeText(this, "selected " + video.getName(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, UnarchivedDetailActivity.class);
+        intent.putExtra(UnarchivedDetailActivity.EXTRA_YOUTUBE_VIDEO, video);
+        startActivity(intent);
     }
 }

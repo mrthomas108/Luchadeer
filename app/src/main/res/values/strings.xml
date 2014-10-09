@@ -36,6 +36,7 @@
 
     <string name="nav_videos">Videos</string>
     <string name="nav_games">Games</string>
+    <string name="nav_unarchived">Unarchived</string>
     <string name="nav_search">Search</string>
     <string name="nav_favorites">Favorites</string>
     <string name="nav_downloads">Downloads</string>
@@ -46,6 +47,7 @@
 
     <string name="tab_videos">Videos</string>
     <string name="tab_games">Games</string>
+    <string name="tab_unarchived">Unarchived</string>
 
     <string name="category_list_header_video">Video</string>
     <!-- this should actually just be in a different strings file -->

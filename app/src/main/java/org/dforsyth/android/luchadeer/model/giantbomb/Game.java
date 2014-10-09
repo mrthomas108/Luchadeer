@@ -43,7 +43,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-public class Game implements ContentListFragment.GiantBombContent, Parcelable {
+public class Game implements ContentListFragment.Content, Parcelable {
     @SerializedName("id") private int mId;
     @SerializedName("name") private String mName;
     @SerializedName("image") private Image mImage;
@@ -69,6 +69,14 @@ public class Game implements ContentListFragment.GiantBombContent, Parcelable {
 
     public Image getImage() {
         return mImage;
+    }
+
+    public String getImageUrl() {
+        if (mImage == null) {
+            return null;
+        }
+
+        return mImage.getSuperUrl();
     }
 
     public void setImage(Image image) {
