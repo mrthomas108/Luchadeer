@@ -57,6 +57,7 @@ import org.dforsyth.android.luchadeer.ui.account.OnAccountStateChangedListener;
 import org.dforsyth.android.luchadeer.ui.account.UnlinkSubscriptionFragment;
 import org.dforsyth.android.luchadeer.ui.game.GameDetailFragment;
 import org.dforsyth.android.luchadeer.ui.game.GameListFragment;
+import org.dforsyth.android.luchadeer.ui.unarchived.UnarchivedDetailFragment;
 import org.dforsyth.android.luchadeer.ui.unarchived.UnarchivedListFragment;
 import org.dforsyth.android.luchadeer.ui.util.UiUtil;
 import org.dforsyth.android.luchadeer.ui.video.VideoDetailFragment;
@@ -86,6 +87,7 @@ public class MainActivity extends BaseActivity implements
     private LinearLayout mNavLayout;
 
     private int mSelectedId;
+    private String mSelectedUnarchivedId;
 
     LayoutInflater mLayoutInflater;
 
@@ -95,8 +97,10 @@ public class MainActivity extends BaseActivity implements
     private static final String LINK_ACCOUNT_FRAGMENT = "link_account_fragment";
     private static final String GAME_DETAIL_FRAGMENT = "game_detail_fragment";
     private static final String VIDEO_DETAIL_FRAGMENT = "video_detail_fragment";
+    private static final String UNARCHIVED_DETAIL_FRAGMENT = "unarchived_detail_fragment";
 
     private static final String STATE_SELECTED_ID = "selected_id";
+    private static final String STATE_SELECTED_UNARCHIVED_ID = "unarchived_selected_id";
 
     private static final int DRAWER_CLOSE_DELAY = 300;
 
@@ -249,6 +253,7 @@ public class MainActivity extends BaseActivity implements
                 .commit();
         } else {
             mSelectedId = savedInstanceState.getInt(STATE_SELECTED_ID);
+            mSelectedUnarchivedId = savedInstanceState.getString(STATE_SELECTED_UNARCHIVED_ID);
         }
 
         getVideoCastManager().reconnectSessionIfPossible(this, false, 3);
@@ -291,6 +296,7 @@ public class MainActivity extends BaseActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(STATE_SELECTED_ID, mSelectedId);
+        outState.putString(STATE_SELECTED_UNARCHIVED_ID, mSelectedUnarchivedId);
         super.onSaveInstanceState(outState);
     }
 
@@ -336,7 +342,7 @@ public class MainActivity extends BaseActivity implements
                     break;
                 }
 
-                fragment = mFragmentManager.findFragmentById(R.id.content_list);
+                fragment = mFragmentManager.findFragmentById(R.id.content_detail);
                 if (fragment != null) {
                     mFragmentManager.beginTransaction().remove(fragment).commit();
                 }
@@ -351,7 +357,7 @@ public class MainActivity extends BaseActivity implements
                     break;
                 }
 
-                fragment = mFragmentManager.findFragmentById(R.id.content_list);
+                fragment = mFragmentManager.findFragmentById(R.id.content_detail);
                 if (fragment != null) {
                     mFragmentManager.beginTransaction().remove(fragment).commit();
                 }
@@ -366,13 +372,13 @@ public class MainActivity extends BaseActivity implements
                     break;
                 }
 
-                fragment = mFragmentManager.findFragmentById(R.id.content_list);
+                fragment = mFragmentManager.findFragmentById(R.id.content_detail);
                 if (fragment != null) {
                     mFragmentManager.beginTransaction().remove(fragment).commit();
                 }
 
                 mFragmentManager.beginTransaction()
-                        .replace(R.id.content_list, new UnarchivedListFragment(), UNARCHIVED_LIST_FRAGMENT)
+                        .replace(R.id.content_list, UnarchivedListFragment.newInstance(), UNARCHIVED_LIST_FRAGMENT)
                         .commit();
                 break;
             case (NAV_SEARCH):
@@ -495,9 +501,29 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onUnarchivedSelected(YouTubeVideo video) {
-        // Toast.makeText(this, "selected " + video.getName(), Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, UnarchivedDetailActivity.class);
-        intent.putExtra(UnarchivedDetailActivity.EXTRA_YOUTUBE_VIDEO, video);
-        startActivity(intent);
+        if (findViewById(R.id.content_detail) != null) {
+            if (mSelectedUnarchivedId != null && mSelectedUnarchivedId.equals(video.getVideoId())) {
+                return;
+            }
+            mSelectedUnarchivedId = video.getVideoId();
+        }
+
+
+        if (findViewById(R.id.content_detail) != null) {
+            mFragmentManager.beginTransaction()
+                    .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                    .replace(R.id.content_detail, UnarchivedDetailFragment.newInstance(video), UNARCHIVED_DETAIL_FRAGMENT)
+                    .commit();
+        } else {
+            if (mSelectedUnarchivedId != video.getVideoId()) {
+                Fragment fragment = mFragmentManager.findFragmentById(R.id.content_detail);
+                if (fragment != null) {
+                    mFragmentManager.beginTransaction().remove(fragment).commit();
+                }
+            }
+            Intent intent = new Intent(this, UnarchivedDetailActivity.class);
+            intent.putExtra(UnarchivedDetailActivity.EXTRA_YOUTUBE_VIDEO, video);
+            startActivity(intent);
+        }
     }
 }

@@ -77,6 +77,10 @@ public class UnarchivedListFragment extends ContentListFragment implements
     private static final String STATE_VIDEOS = "videos";
     private static final String STATE_TOKEN = "token";
 
+    public static UnarchivedListFragment newInstance() {
+        return new UnarchivedListFragment();
+    }
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
