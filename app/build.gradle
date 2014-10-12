@@ -8,8 +8,8 @@ android {
         applicationId "org.dforsyth.android.luchadeer"
         minSdkVersion 16
         targetSdkVersion 19
-        versionCode 13
-        versionName "0.0.13"
+        versionCode 14
+        versionName "0.1.0"
     }
     buildTypes {
         release {
