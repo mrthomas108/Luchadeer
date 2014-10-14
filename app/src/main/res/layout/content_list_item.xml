@@ -55,6 +55,8 @@
         android:layout_gravity="center"
         android:background="@color/content_list_name_background"
         android:gravity="center"
+        android:maxLines="2"
+        android:ellipsize="end"
         android:textSize="@dimen/content_list_name_text_size"
         android:fontFamily="sans-serif-light"/>
 

@@ -43,6 +43,7 @@
     <style name="AppCompatTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/MyCompatActionBar</item>
         <item name="android:actionBarTabStyle">@style/WhiteTabIndicator</item>
+        <item name="actionModeShareDrawable">@drawable/ic_action_share</item>
     </style>
 
     <!-- Base application theme. -->

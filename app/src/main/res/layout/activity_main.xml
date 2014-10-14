@@ -62,7 +62,7 @@
 
     <ScrollView
         android:id="@+id/drawer_scroll"
-        android:layout_width="@dimen/nav_drawar_width"
+        android:layout_width="288dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@android:color/white">

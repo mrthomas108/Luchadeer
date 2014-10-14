@@ -281,7 +281,7 @@ public class GameDetailFragment extends Fragment implements
         // if we already know we're a favorite, update the icon (since we wouldn't have been able to
         // do it in setFavorite)
         if (mIsFavorite) {
-            mFavoriteMenuItem.setIcon(R.drawable.ic_action_important);
+            mFavoriteMenuItem.setIcon(R.drawable.ic_action_favorite);
         }
     }
 
@@ -704,9 +704,9 @@ public class GameDetailFragment extends Fragment implements
         mIsFavorite = favorite;
         if (mFavoriteMenuItem != null) {
             if (mIsFavorite) {
-                mFavoriteMenuItem.setIcon(R.drawable.ic_action_important);
+                mFavoriteMenuItem.setIcon(R.drawable.ic_action_favorite);
             } else {
-                mFavoriteMenuItem.setIcon(R.drawable.ic_action_not_important);
+                mFavoriteMenuItem.setIcon(R.drawable.ic_action_favorite_outline);
             }
         }
     }

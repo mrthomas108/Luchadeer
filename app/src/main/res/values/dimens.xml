@@ -37,7 +37,7 @@
 
     <dimen name="content_list_name_text_size">30sp</dimen>
 
-    <dimen name="nav_drawar_width">240dp</dimen>
+    <dimen name="nav_drawar_width">288dp</dimen>
 
     <dimen name="normal_text_size">15sp</dimen>
     <dimen name="small_text_size">12sp</dimen>

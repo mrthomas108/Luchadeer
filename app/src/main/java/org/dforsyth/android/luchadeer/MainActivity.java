@@ -138,19 +138,19 @@ public class MainActivity extends BaseActivity implements
     };
 
     private final static int[] NAV_ICONS = new int[] {
-            R.drawable.ic_action_video,
-            R.drawable.ic_action_gamepad,
-            R.drawable.ic_action_video,
-            R.drawable.ic_action_search,
+            R.drawable.ic_action_light_videocam,
+            R.drawable.ic_action_light_games,
+            R.drawable.ic_action_light_youtube,
+            R.drawable.ic_action_light_search,
             0,
-            R.drawable.holo_light_ic_action_important,
-            R.drawable.holo_light_ic_action_download,
+            R.drawable.ic_action_light_favorite,
+            R.drawable.ic_action_light_nopad_download,
             0,
-            R.drawable.ic_action_accounts,
-            R.drawable.ic_action_settings,
+            R.drawable.ic_action_light_accounts,
+            R.drawable.ic_action_light_settings,
             0,
-            R.drawable.holo_light_ic_action_web_site,
-            R.drawable.holo_light_ic_action_web_site,
+            R.drawable.ic_action_light_web_site,
+            R.drawable.ic_action_light_web_site,
     };
 
 
@@ -172,10 +172,11 @@ public class MainActivity extends BaseActivity implements
         }
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
-                R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
+                R.drawable.ic_material_drawer,  /* nav drawer icon to replace 'Up' caret */
                 R.string.app_name,  /* "open drawer" description */
                 R.string.app_name  /* "close drawer" description */
         ) {

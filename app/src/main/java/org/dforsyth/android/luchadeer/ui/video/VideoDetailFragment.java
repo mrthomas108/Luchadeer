@@ -497,7 +497,7 @@ public class VideoDetailFragment extends Fragment implements
                 DownloadInfo info = mDownloadMap.get(quality);
                 if (info != null) {
                     tv.setCompoundDrawablesWithIntrinsicBounds(
-                            R.drawable.holo_dark_ic_action_download,
+                            R.drawable.ic_action_download,
                             0,
                             0,
                             0);
@@ -521,7 +521,7 @@ public class VideoDetailFragment extends Fragment implements
                 if (info != null) {
                     Log.d(TAG, "found info for " + getItem(position) + "(" + position + ")");
                     tv.setCompoundDrawablesWithIntrinsicBounds(
-                            R.drawable.holo_light_ic_action_download,
+                            R.drawable.ic_action_light_download,
                             0,
                             0,
                             0);
@@ -567,9 +567,9 @@ public class VideoDetailFragment extends Fragment implements
         mIsFavorite = favorite;
         if (mFavorite != null) {
             if (mIsFavorite) {
-                mFavorite.setImageResource(R.drawable.ic_action_important);
+                mFavorite.setImageResource(R.drawable.ic_action_favorite);
             } else {
-                mFavorite.setImageResource(R.drawable.ic_action_not_important);
+                mFavorite.setImageResource(R.drawable.ic_action_favorite_outline);
             }
         }
     }
