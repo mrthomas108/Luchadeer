@@ -35,6 +35,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="element_padding">16dp</dimen>
+
     <dimen name="content_list_name_text_size">30sp</dimen>
 
     <dimen name="nav_drawar_width">288dp</dimen>

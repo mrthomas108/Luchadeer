@@ -81,8 +81,8 @@
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp">
+                    android:paddingLeft="@dimen/element_padding"
+                    android:paddingRight="@dimen/element_padding">
 
                     <TextView
                         style="@style/vertical_padded"
@@ -166,8 +166,8 @@
                     android:textSize="@dimen/normal_text_size"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
-                    android:paddingRight="15dp"
-                    android:paddingLeft="15dp"
+                    android:paddingRight="@dimen/element_padding"
+                    android:paddingLeft="@dimen/element_padding"
                     android:visibility="gone"/>
 
                 <include
@@ -184,8 +184,8 @@
                     android:visibility="gone">
 
                     <View style="@style/divider"
-                          android:layout_marginLeft="15dp"
-                          android:layout_marginRight="15dp"/>
+                          android:layout_marginLeft="@dimen/element_padding"
+                          android:layout_marginRight="@dimen/element_padding"/>
 
                     <TextView
                         android:text="@string/related_videos"
@@ -193,8 +193,8 @@
                         android:textSize="@dimen/detail_title_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="15dp"
-                        android:paddingRight="15dp"/>
+                        android:paddingLeft="@dimen/element_padding"
+                        android:paddingRight="@dimen/element_padding"/>
                 </LinearLayout>
 
                 <include
@@ -211,8 +211,8 @@
                     android:visibility="gone">
 
                     <View style="@style/divider"
-                        android:layout_marginLeft="15dp"
-                        android:layout_marginRight="15dp"/>
+                        android:layout_marginLeft="@dimen/element_padding"
+                        android:layout_marginRight="@dimen/element_padding"/>
 
                     <TextView
                         android:text="@string/similar_games"
@@ -220,8 +220,8 @@
                         android:textSize="@dimen/detail_title_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="15dp"
-                        android:paddingRight="15dp"/>
+                        android:paddingLeft="@dimen/element_padding"
+                        android:paddingRight="@dimen/element_padding"/>
 
                 </LinearLayout>
 
@@ -244,7 +244,7 @@
                     android:orientation="vertical"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:padding="15dp"
+                    android:padding="@dimen/element_padding"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="3">
 

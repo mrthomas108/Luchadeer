@@ -52,8 +52,8 @@
                 android:layout_marginBottom="?android:attr/actionBarSize"
                 android:layout_height="?android:attr/actionBarSize"
                 android:background="@color/video_detail_info_background"
-                android:paddingRight="15dp"
-                android:paddingLeft="15dp"
+                android:paddingRight="@dimen/element_padding"
+                android:paddingLeft="@dimen/element_padding"
                 android:orientation="vertical"
                 android:gravity="center_vertical">
 
@@ -88,7 +88,10 @@
                     </TextView>
 
                     <FrameLayout android:id="@+id/video_length_section" android:layout_width="wrap_content" android:layout_height="wrap_content">
-                        <View style="@style/vertical_divider" android:layout_marginLeft="10dp" android:layout_marginRight="10dp"/>
+                        <View
+                            style="@style/vertical_divider"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
 
                         <TextView
                             android:id="@+id/video_length_seconds"

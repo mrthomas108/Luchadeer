@@ -52,8 +52,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:background="@android:color/white"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp">
+                android:paddingLeft="@dimen/element_padding"
+                android:paddingRight="@dimen/element_padding">
 
                 <LinearLayout
                     android:orientation="vertical"
