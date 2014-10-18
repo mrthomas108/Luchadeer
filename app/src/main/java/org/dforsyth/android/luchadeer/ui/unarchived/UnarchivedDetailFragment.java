@@ -52,6 +52,7 @@ import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.ui.util.FadeNetworkImageView;
 import org.dforsyth.android.luchadeer.ui.util.UiUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 public class UnarchivedDetailFragment extends Fragment implements DrawerLayout.DrawerListener {
@@ -127,7 +128,11 @@ public class UnarchivedDetailFragment extends Fragment implements DrawerLayout.D
         if (mDeck != null) {
             mDeck.setText(snippet.getDescription());
         }
-        mPublished.setText(snippet.getPublishedAt().toString());
+        // mPublished.setText(snippet.getPublishedAt().toString());
+
+        SimpleDateFormat format = new SimpleDateFormat("MMM d, yyyy h:mm a");
+        mPublished.setText(format.format(snippet.getPublishedAt()));
+
         mUser.setText(String.format("Posted by: %s", snippet.getChannelTitle()));
 
         HashMap<String, YouTubeVideo.Thumbnail> thumbnails = snippet.getThumbnails();

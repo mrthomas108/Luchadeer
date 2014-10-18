@@ -150,12 +150,14 @@ public class GameListFragment extends ContentListFragment implements
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void setupActionBarForFragment() {
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        mActionBar.setTitle(getResources().getString(R.string.app_name));
-        mActionBar.setSubtitle("Games");
+        // mActionBar.setTitle(getResources().getString(R.string.app_name));
+        mActionBar.setTitle("Games");
     }
 
+    @SuppressWarnings("deprecation")
     private void setupActionBarForDrawer() {
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         mActionBar.setTitle(getResources().getString(R.string.app_name));

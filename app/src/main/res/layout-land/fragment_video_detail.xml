@@ -87,7 +87,11 @@
                         android:textSize="@dimen/abc_action_bar_subtitle_text_size">
                     </TextView>
 
-                    <FrameLayout android:id="@+id/video_length_section" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:id="@+id/video_length_section"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
                         <View
                             style="@style/vertical_divider"
                             android:layout_marginLeft="10dp"
@@ -99,7 +103,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/abc_action_bar_subtitle_text_size">
                         </TextView>
-                    </FrameLayout>
+                    </LinearLayout>
                 </LinearLayout>
 
             </LinearLayout>

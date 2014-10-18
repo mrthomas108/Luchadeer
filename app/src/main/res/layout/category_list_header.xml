@@ -44,11 +44,4 @@
         android:textSize="@dimen/abc_action_bar_title_text_size"
         android:text="@string/category_list_header_video"/>
 
-    <TextView
-        android:id="@+id/sub_title"
-        android:textColor="@android:color/darker_gray"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/abc_action_bar_subtitle_text_size"/>
-
 </LinearLayout>

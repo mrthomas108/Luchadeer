@@ -86,7 +86,7 @@ public class UnarchivedListFragment extends ContentListFragment implements
         super.onViewCreated(view, savedInstanceState);
 
         mActionBar = getActivity().getActionBar();
-        mActionBar.setSubtitle("Unarchived");
+        mActionBar.setTitle("Unarchived");
 
         mListView = (PaginatedListView) getListView();
         mSwipeRefreshLayout = getSwipeRefreshLayout();
@@ -127,12 +127,10 @@ public class UnarchivedListFragment extends ContentListFragment implements
 
     @Override
     public void onDrawerOpened(View view) {
-        mActionBar.setSubtitle(null);
     }
 
     @Override
     public void onDrawerClosed(View view) {
-        mActionBar.setSubtitle("Unarchived");
     }
 
     @Override

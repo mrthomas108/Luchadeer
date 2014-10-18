@@ -257,6 +257,7 @@ public class VideoListFragment extends ContentListFragment implements
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void setupActionBarForFragment() {
         Log.d(TAG, "setupActionBarForFragment");
         if (mVideoTypes != null && mVideoTypes.size() > 0) {
@@ -266,6 +267,7 @@ public class VideoListFragment extends ContentListFragment implements
         mActionBar.setSubtitle(null);
     }
 
+    @SuppressWarnings("deprecation")
     private void setupActionBarForDrawer() {
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         mActionBar.setTitle(getString(R.string.app_name));
@@ -384,8 +386,8 @@ public class VideoListFragment extends ContentListFragment implements
                 convertView = inflater.inflate(R.layout.category_list_header, parent, false);
             }
 
-            TextView subTitle = (TextView) convertView.findViewById(R.id.sub_title);
-            subTitle.setText(getItem(position));
+            TextView title = (TextView) convertView.findViewById(R.id.title);
+            title.setText(getItem(position));
 
             return convertView;
         }
