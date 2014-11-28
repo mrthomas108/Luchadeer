@@ -34,6 +34,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 
 
@@ -83,6 +84,14 @@ public class PaginatedListView extends ListView {
         mAvailableItemCount = availableItemCount;
     }
 
+    @Override
+    public void setAdapter(ListAdapter adapter) {
+        if (mLoadingFooter != null && getFooterViewsCount() == 0) {
+            addFooterView(mLoadingFooter, null, false);
+        }
+        super.setAdapter(adapter);
+    }
+
     public void setLoadingBoundary(int loadingBoundary) {
         mLoadingBoundary = loadingBoundary;
     }
@@ -90,11 +99,6 @@ public class PaginatedListView extends ListView {
     public void setLoadingNextPage(boolean loadingNextPage) {
         if (mLoadingNextPage != loadingNextPage) {
             mLoadingNextPage = loadingNextPage;
-            // clear regardless
-            removeFooterView(mLoadingFooter);
-            if (mLoadingNextPage) {
-                addFooterView(mLoadingFooter);
-            }
         }
     }
 
@@ -126,14 +130,15 @@ public class PaginatedListView extends ListView {
             if (totalItemCount < mAvailableItemCount && firstVisibleItem >= totalItemCount - visibleItemCount - mLoadingBoundary) {
 
                 if (!mLoadingNextPage) {
-                    removeFooterView(mLoadingFooter);
-                    addFooterView(mLoadingFooter);
-                    // fetch
                     mLoadingNextPage = true;
                     if (mOnRequestNextPageListener != null) {
                         mOnRequestNextPageListener.onRequestNextPage();
                     }
                 }
+            }
+
+            if (totalItemCount >= mAvailableItemCount && getFooterViewsCount() > 0) {
+                removeFooterView(mLoadingFooter);
             }
 
             if (mOnScrollListener != null) {
