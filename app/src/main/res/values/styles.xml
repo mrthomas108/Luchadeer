@@ -32,41 +32,23 @@
 
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="android:actionBarStyle">@style/MyActionBar</item>
-        <!-- <item name="android:windowActionBarOverlay">true</item> -->
-        <!-- <item name="android:windowContentOverlay">@null</item> -->
-        <item name="actionModeShareDrawable">@drawable/ic_action_share</item>
-    </style>
-
-    <style name="AppCompatTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/MyCompatActionBar</item>
-        <item name="android:actionBarTabStyle">@style/WhiteTabIndicator</item>
-        <item name="actionBarWidgetTheme">@style/Theme.AppCompat.CustomShareIcon</item>
-        <item name="android:actionBarWidgetTheme">@style/Theme.AppCompat.CustomShareIcon</item>
-    </style>
-
-    <!-- Base application theme. -->
-    <style name="TransparentAppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="android:actionBarStyle">@style/TransparentActionBar</item>
-        <item name="android:windowActionBarOverlay">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="actionModeShareDrawable">@drawable/ic_action_share</item>
-    </style>
-
-    <style name="TransparentAppCompatTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="BaseAppCompatTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:actionBarStyle">@style/TransparentCompatActionBar</item>
+        <item name="windowActionBar">false</item>
         <item name="android:windowActionBarOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="actionBarWidgetTheme">@style/Theme.AppCompat.CustomShareIcon</item>
-        <item name="android:actionBarWidgetTheme">@style/Theme.AppCompat.CustomShareIcon</item>
+
+        <item name="colorPrimary">@color/gb_grey</item>
+        <item name="colorPrimaryDark">@color/dark_grey</item>
     </style>
 
-    <style name="Theme.AppCompat.CustomShareIcon" parent="@style/Theme.AppCompat">
-        <item name="actionModeShareDrawable">@drawable/ic_action_share</item> <!-- your icon goes here -->
+    <style name="BaseAppCompatNoOverlayTheme" parent="BaseAppCompatTheme">
+        <item name="android:windowActionBarOverlay">false</item>
+    </style>
+
+    <style name="BlackPrimaryDarkAppCompatTheme" parent="BaseAppCompatTheme">
+        <item name="colorPrimaryDark">@color/black</item>
     </style>
 
     <!-- ActionBar styles -->

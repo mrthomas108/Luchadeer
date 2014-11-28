@@ -30,16 +30,15 @@
 
 package org.dforsyth.android.luchadeer.ui.favorites;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ListFragment;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -69,7 +68,7 @@ public abstract class FavoritesListFragment extends ListFragment implements
     // private Activity mActivity;
     private ListView mListView;
 
-    // private ActionMode mActionMode;
+    private ActionMode mActionMode;
 
     private ActionModeListener mActionModeListener;
 
@@ -134,6 +133,16 @@ public abstract class FavoritesListFragment extends ListFragment implements
         Log.d(TAG, "detached!");
         if (mFavoritesObserver != null) {
             getActivity().getContentResolver().unregisterContentObserver(mFavoritesObserver);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mActionMode != null) {
+            mActionMode.finish();
+            mActionMode = null;
         }
     }
 
@@ -213,6 +222,8 @@ public abstract class FavoritesListFragment extends ListFragment implements
                 MenuInflater inflater = actionMode.getMenuInflater();
                 inflater.inflate(R.menu.list_remove_context, menu);
 
+                mActionMode = actionMode;
+
                 if (mActionModeListener != null) {
                     mActionModeListener.onCreateActionMode();
                 }
@@ -251,11 +262,11 @@ public abstract class FavoritesListFragment extends ListFragment implements
 
             @Override
             public void onDestroyActionMode(ActionMode actionMode) {
-                getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
                 if (mActionModeListener != null) {
                     mActionModeListener.onDestroyActionMode();
                 }
+
+                mActionMode = null;
             }
         });
     }

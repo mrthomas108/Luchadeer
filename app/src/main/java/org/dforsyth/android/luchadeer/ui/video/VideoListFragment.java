@@ -30,14 +30,14 @@
 
 package org.dforsyth.android.luchadeer.ui.video;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,9 +52,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.RequestFuture;
 
 import org.dforsyth.android.luchadeer.R;
-import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.model.giantbomb.Video;
 import org.dforsyth.android.luchadeer.model.giantbomb.VideoType;
+import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.persist.LuchadeerPersist;
 import org.dforsyth.android.luchadeer.persist.LuchadeerPreferences;
 import org.dforsyth.android.luchadeer.persist.db.LuchadeerContract;
@@ -73,7 +73,7 @@ import java.util.Date;
 
 
 public class VideoListFragment extends ContentListFragment implements
-        DrawerLayout.DrawerListener, LoaderManager.LoaderCallbacks<LoaderListResult<Video>> {
+        LoaderManager.LoaderCallbacks<LoaderListResult<Video>> {
     private static final String TAG = VideoListFragment.class.getName();
 
     private ArrayList<VideoType> mVideoTypes;
@@ -170,7 +170,8 @@ public class VideoListFragment extends ContentListFragment implements
         // just always say retry, there wont be empty categories
         setEmptyText(getString(R.string.video_list_empty));
 
-        mActionBar = getActivity().getActionBar();
+        ActionBarActivity activity = (ActionBarActivity) getActivity();
+        mActionBar = activity.getSupportActionBar();
 
         // override
         mListView = (ParallaxListView) getListView();
@@ -257,7 +258,6 @@ public class VideoListFragment extends ContentListFragment implements
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void setupActionBarForFragment() {
         Log.d(TAG, "setupActionBarForFragment");
         if (mVideoTypes != null && mVideoTypes.size() > 0) {
@@ -265,32 +265,6 @@ public class VideoListFragment extends ContentListFragment implements
             mActionBar.setTitle("");
         }
         mActionBar.setSubtitle(null);
-    }
-
-    @SuppressWarnings("deprecation")
-    private void setupActionBarForDrawer() {
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        mActionBar.setTitle(getString(R.string.app_name));
-        mActionBar.setSubtitle(null);
-    }
-
-    @Override
-    public void onDrawerSlide(View view, float slideOffset) {
-    }
-
-    @Override
-    public void onDrawerOpened(View view) {
-        setupActionBarForDrawer();
-    }
-
-    @Override
-    public void onDrawerClosed(View view) {
-        setupActionBarForFragment();
-    }
-
-    @Override
-    public void onDrawerStateChanged(int i) {
-
     }
 
     @Override

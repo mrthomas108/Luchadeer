@@ -30,8 +30,9 @@
 
 package org.dforsyth.android.luchadeer;
 
-import android.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 
 import org.dforsyth.android.luchadeer.ui.favorites.FavoritesViewPagerFragment;
@@ -44,11 +45,16 @@ public class FavoritesActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_container_with_minicontroller);
 
-        getFragmentManager().beginTransaction()
-                .add(R.id.container, new FavoritesViewPagerFragment(), "favorites_view_pager")
-                .commit();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getActionBar();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new FavoritesViewPagerFragment(), "favorites_view_pager")
+                    .commit();
+        }
+
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 

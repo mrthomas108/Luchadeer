@@ -30,15 +30,15 @@
 
 package org.dforsyth.android.luchadeer.ui.unarchived;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -56,7 +56,6 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 public class UnarchivedListFragment extends ContentListFragment implements
-        DrawerLayout.DrawerListener,
         LoaderManager.LoaderCallbacks<LoaderResult<LuchadeerApi.YouTubeListResponse>>{
 
     private static final String TAG = UnarchivedListFragment.class.getName();
@@ -85,8 +84,10 @@ public class UnarchivedListFragment extends ContentListFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mActionBar = getActivity().getActionBar();
+        ActionBarActivity activity = (ActionBarActivity) getActivity();
+        mActionBar = activity.getSupportActionBar();
         mActionBar.setTitle("Unarchived");
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
         mListView = (PaginatedListView) getListView();
         mSwipeRefreshLayout = getSwipeRefreshLayout();
@@ -118,24 +119,6 @@ public class UnarchivedListFragment extends ContentListFragment implements
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mListener = (OnUnarchivedSelectedListener) activity;
-    }
-
-    @Override
-    public void onDrawerSlide(View view, float v) {
-
-    }
-
-    @Override
-    public void onDrawerOpened(View view) {
-    }
-
-    @Override
-    public void onDrawerClosed(View view) {
-    }
-
-    @Override
-    public void onDrawerStateChanged(int i) {
-
     }
 
     private static class YouTubeChannelLoader extends AsyncTaskLoader<LoaderResult<LuchadeerApi.YouTubeListResponse>> {

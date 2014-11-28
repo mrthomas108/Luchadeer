@@ -30,8 +30,9 @@
 
 package org.dforsyth.android.luchadeer;
 
-import android.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 
 import org.dforsyth.android.luchadeer.model.youtube.YouTubeVideo;
 import org.dforsyth.android.luchadeer.ui.unarchived.UnarchivedDetailFragment;
@@ -43,7 +44,13 @@ public class UnarchivedDetailActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_container_with_minicontroller);
+        setContentView(R.layout.activity_container_with_minicontroller_toolbar_overlay);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        toolbar.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+
         if (savedInstanceState == null) {
             YouTubeVideo video = getIntent().getParcelableExtra(EXTRA_YOUTUBE_VIDEO);
 
@@ -52,7 +59,7 @@ public class UnarchivedDetailActivity extends BaseActivity {
                     .commit();
         }
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
     }

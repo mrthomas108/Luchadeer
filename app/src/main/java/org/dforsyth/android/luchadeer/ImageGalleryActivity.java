@@ -32,7 +32,7 @@ package org.dforsyth.android.luchadeer;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.View;
+import android.support.v7.widget.Toolbar;
 
 import org.dforsyth.android.luchadeer.model.giantbomb.Image;
 import org.dforsyth.android.luchadeer.ui.gallery.ImageGalleryFragment;
@@ -47,7 +47,10 @@ public class ImageGalleryActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_container_with_minicontroller);
+        setContentView(R.layout.activity_container_with_minicontroller_toolbar_overlay);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         ArrayList<Image> list = getIntent().getParcelableArrayListExtra(EXTRA_IMAGES);
         String startUrl = getIntent().getStringExtra(EXTRA_START_URL);
@@ -58,11 +61,6 @@ public class ImageGalleryActivity extends ActionBarActivity {
                     .commit();
         }
 
-        getActionBar().hide();
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        getSupportActionBar().hide();
     }
 }

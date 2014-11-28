@@ -30,8 +30,6 @@
 
 package org.dforsyth.android.luchadeer.ui.player;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -42,6 +40,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -66,11 +66,12 @@ public class VideoPlayerFragment extends Fragment implements MediaPlayer.OnCompl
     private final static String ARG_VIDEO_NAME = "video_name";
     private final static String ARG_GIANT_BOMB_ID = "giantbomb_id";
 
-    private Activity mActivity;
+    private ActionBarActivity mActivity;
     private ActionBar mActionBar;
     private View mDecorView;
     private int mNavigationBarHeight;
     private int mNavigationBarWidth;
+    private int mStatusBarHeight;
     private boolean mMarkable;
 
     private Handler mHandler;
@@ -103,8 +104,8 @@ public class VideoPlayerFragment extends Fragment implements MediaPlayer.OnCompl
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mActivity = getActivity();
-        mActionBar = mActivity.getActionBar();
+        mActivity = (ActionBarActivity) getActivity();
+        mActionBar = mActivity.getSupportActionBar();
 
         mDecorView = mActivity.getWindow().getDecorView();
 
@@ -280,7 +281,6 @@ public class VideoPlayerFragment extends Fragment implements MediaPlayer.OnCompl
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
                     | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE
             );
         }
     }

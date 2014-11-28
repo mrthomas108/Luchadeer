@@ -30,8 +30,9 @@
 
 package org.dforsyth.android.luchadeer;
 
-import android.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 
 import org.dforsyth.android.luchadeer.ui.game.GameDetailFragment;
 
@@ -44,7 +45,10 @@ public class GameDetailActivity extends BaseActivity implements GameDetailFragme
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_container_with_minicontroller);
+        setContentView(R.layout.activity_container_with_minicontroller_toolbar_overlay);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         mGameId = getIntent().getIntExtra(EXTRA_GAME_ID, -1);
 
@@ -54,7 +58,7 @@ public class GameDetailActivity extends BaseActivity implements GameDetailFragme
                     .commit();
         }
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
     }

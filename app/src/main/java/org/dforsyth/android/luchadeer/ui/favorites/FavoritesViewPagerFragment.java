@@ -30,26 +30,27 @@
 
 package org.dforsyth.android.luchadeer.ui.favorites;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.v13.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.ui.util.DisableableViewPager;
+import org.dforsyth.android.luchadeer.ui.util.SlidingTabLayout;
 
 
-public class FavoritesViewPagerFragment extends Fragment implements ViewPager.OnPageChangeListener, FavoritesListFragment.ActionModeListener {
+public class FavoritesViewPagerFragment extends Fragment implements FavoritesListFragment.ActionModeListener {
 
-    private Activity mActivity;
+    private ActionBarActivity mActivity;
     private ActionBar mActionBar;
+
+    private SlidingTabLayout mSlidingTabLayout;
 
     private DisableableViewPager mViewPager;
 
@@ -57,71 +58,62 @@ public class FavoritesViewPagerFragment extends Fragment implements ViewPager.On
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_favorites_viewpager, container, false);
 
+        mActivity = (ActionBarActivity) getActivity();
+        mActionBar = mActivity.getSupportActionBar();
+
         mViewPager = (DisableableViewPager) view.findViewById(R.id.favorites_pager);
 
-        mActivity = getActivity();
-        mActionBar = mActivity.getActionBar();
+        mViewPager.setAdapter(new FavoritesFragmentPagerAdapter(getChildFragmentManager()));
 
-        if (mActionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS)
-            return view;
+        mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tab_layout);
+        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.white);
+            }
 
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            @Override
+            public int getDividerColor(int position) {
+                return getResources().getColor(R.color.white);
+            }
+        });
+        mSlidingTabLayout.setTextColor(getResources().getColor(R.color.white));
 
-        mActionBar.addTab(
-                mActionBar.newTab()
-                        .setText(R.string.tab_videos)
-                        .setTabListener(new FavoritesTabListener(mViewPager, 0)));
-
-        mActionBar.addTab(
-                mActionBar.newTab()
-                        .setText(R.string.tab_games)
-                        .setTabListener(new FavoritesTabListener(mViewPager, 1)));
-
-        mViewPager.setOnPageChangeListener(this);
-        mViewPager.setAdapter(new FavoritesFragmentPagerAdapter(getFragmentManager()));
+        // call this last so textcolor takes
+        mSlidingTabLayout.setViewPager(mViewPager);
 
         return view;
     }
 
     @Override
     public void onCreateActionMode() {
+        mSlidingTabLayout.disableTabs();
         mViewPager.setPagerEnabled(false);
     }
 
     @Override
     public void onDestroyActionMode() {
+        mSlidingTabLayout.enableTabs();
         mViewPager.setPagerEnabled(true);
-    }
-
-    private class FavoritesTabListener implements ActionBar.TabListener {
-        private int mItem;
-        private ViewPager mPager;
-
-        public FavoritesTabListener(ViewPager pager, int pagerItem) {
-            mItem = pagerItem;
-            mPager = pager;
-        }
-
-        @Override
-        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-            mPager.setCurrentItem(mItem);
-        }
-
-        @Override
-        public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
-        }
-
-        @Override
-        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
-        }
     }
 
     private class FavoritesFragmentPagerAdapter extends FragmentPagerAdapter {
 
         public FavoritesFragmentPagerAdapter(FragmentManager fm) {
             super(fm);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case (0):
+                    return "Videos";
+                case (1):
+                    return "Games";
+                default:
+            }
+
+            throw new RuntimeException("no position");
         }
 
         @Override
@@ -147,23 +139,5 @@ public class FavoritesViewPagerFragment extends Fragment implements ViewPager.On
         public int getCount() {
             return 2;
         }
-    }
-
-    @Override
-    public void onPageScrolled(int i, float v, int i2) {
-
-    }
-
-    @Override
-    public void onPageSelected(int i) {
-        // tabs might be gone in context menu...
-        if (mActionBar.getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS) {
-            mActionBar.setSelectedNavigationItem(i);
-        }
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int i) {
-
     }
 }

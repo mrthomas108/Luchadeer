@@ -31,15 +31,15 @@
 package org.dforsyth.android.luchadeer.ui.game;
 
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -51,8 +51,8 @@ import com.android.volley.toolbox.RequestFuture;
 
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.SearchActivity;
-import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.model.giantbomb.Game;
+import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.ui.util.ContentListFragment;
 import org.dforsyth.android.luchadeer.ui.util.PaginatedListView;
 import org.dforsyth.android.luchadeer.ui.util.ParallaxListView;
@@ -64,7 +64,7 @@ import java.util.ArrayList;
 
 
 public class GameListFragment extends ContentListFragment implements
-        DrawerLayout.DrawerListener, LoaderManager.LoaderCallbacks<LoaderListResult<Game>> {
+        LoaderManager.LoaderCallbacks<LoaderListResult<Game>> {
     private static final String TAG = GameListFragment.class.getName();
 
     private GameArrayAdapter mArrayAdapter;
@@ -127,7 +127,8 @@ public class GameListFragment extends ContentListFragment implements
 
         setEmptyText(getString(R.string.game_list_empty));
 
-        mActionBar = getActivity().getActionBar();
+        ActionBarActivity activity = (ActionBarActivity) getActivity();
+        mActionBar = activity.getSupportActionBar();
 
         mListView = (ParallaxListView) getListView();
         mSwipeRefreshLayout = getSwipeRefreshLayout();
@@ -150,37 +151,9 @@ public class GameListFragment extends ContentListFragment implements
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void setupActionBarForFragment() {
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        // mActionBar.setTitle(getResources().getString(R.string.app_name));
         mActionBar.setTitle("Games");
-    }
-
-    @SuppressWarnings("deprecation")
-    private void setupActionBarForDrawer() {
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        mActionBar.setTitle(getResources().getString(R.string.app_name));
-        mActionBar.setSubtitle(null);
-    }
-
-    @Override
-    public void onDrawerSlide(View view, float slideOffset) {
-    }
-
-    @Override
-    public void onDrawerOpened(View view) {
-        setupActionBarForDrawer();
-    }
-
-    @Override
-    public void onDrawerClosed(View view) {
-        setupActionBarForFragment();
-    }
-
-    @Override
-    public void onDrawerStateChanged(int i) {
-
     }
 
     @Override

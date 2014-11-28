@@ -74,7 +74,7 @@ public class DownloadsListFragment extends ListFragment implements LoaderManager
     private LuchadeerApi mApi;
     private ListView mListView;
 
-    private boolean mActionEnabled;
+    private ActionMode mActionMode;
 
     BatchContentObserver mDownloadsObserver;
     OnStartVideoListener mOnStartVideoListener;
@@ -152,6 +152,16 @@ public class DownloadsListFragment extends ListFragment implements LoaderManager
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mActionMode != null) {
+            mActionMode.finish();
+            mActionMode = null;
+        }
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
 
@@ -221,15 +231,13 @@ public class DownloadsListFragment extends ListFragment implements LoaderManager
                 case (DownloadManager.STATUS_SUCCESSFUL):
                     statusText = "Complete";
                     ImageView playButton = new ImageView(mActivity);
-                    playButton.setImageResource(R.drawable.ic_action_play);
+                    playButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
                     indicator.addView(playButton);
 
                     indicator.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            if (mActionEnabled) {
-                                mOnStartVideoListener.onStartVideo(name, uri, giantBombId, imageUrl);
-                            }
+                            mOnStartVideoListener.onStartVideo(name, uri, giantBombId, imageUrl);
                         }
                     });
 
@@ -293,7 +301,7 @@ public class DownloadsListFragment extends ListFragment implements LoaderManager
                 MenuInflater inflater = actionMode.getMenuInflater();
                 inflater.inflate(R.menu.list_remove_context, menu);
 
-                mActionEnabled = false;
+                mActionMode = actionMode;
 
                 return true;
             }
@@ -332,11 +340,9 @@ public class DownloadsListFragment extends ListFragment implements LoaderManager
 
             @Override
             public void onDestroyActionMode(ActionMode actionMode) {
-                mActionEnabled = true;
+                mActionMode = null;
             }
         });
-
-        mActionEnabled = true;
     }
 
     public interface OnStartVideoListener {

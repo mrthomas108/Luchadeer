@@ -33,6 +33,7 @@ package org.dforsyth.android.luchadeer;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import org.dforsyth.android.luchadeer.persist.LuchadeerPreferences;
@@ -48,13 +49,16 @@ public class PreferencesActivity extends BaseActivity implements OnAccountStateC
 
         setContentView(R.layout.activity_container);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new PreferencesFragment())
                     .commit();
         }
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

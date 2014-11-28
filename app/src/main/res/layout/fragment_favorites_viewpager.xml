@@ -36,14 +36,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <org.dforsyth.android.luchadeer.ui.util.SlidingTabLayout
+        android:id="@+id/sliding_tab_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:background="?colorPrimary" />
 
     <org.dforsyth.android.luchadeer.ui.util.DisableableViewPager
         android:id="@+id/favorites_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </org.dforsyth.android.luchadeer.ui.util.DisableableViewPager>
-
-
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

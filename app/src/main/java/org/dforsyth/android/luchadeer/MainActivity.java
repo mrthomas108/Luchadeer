@@ -30,7 +30,6 @@
 
 package org.dforsyth.android.luchadeer;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -38,8 +37,10 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -59,7 +60,6 @@ import org.dforsyth.android.luchadeer.ui.game.GameDetailFragment;
 import org.dforsyth.android.luchadeer.ui.game.GameListFragment;
 import org.dforsyth.android.luchadeer.ui.unarchived.UnarchivedDetailFragment;
 import org.dforsyth.android.luchadeer.ui.unarchived.UnarchivedListFragment;
-import org.dforsyth.android.luchadeer.ui.util.UiUtil;
 import org.dforsyth.android.luchadeer.ui.video.VideoDetailFragment;
 import org.dforsyth.android.luchadeer.ui.video.VideoListFragment;
 import org.dforsyth.android.luchadeer.util.IntentUtil;
@@ -138,19 +138,19 @@ public class MainActivity extends BaseActivity implements
     };
 
     private final static int[] NAV_ICONS = new int[] {
-            R.drawable.ic_action_light_videocam,
-            R.drawable.ic_action_light_games,
-            R.drawable.ic_action_light_youtube,
-            R.drawable.ic_action_light_search,
+            R.drawable.ic_videocam_black_24dp,
+            R.drawable.ic_games_black_24dp,
+            R.drawable.ic_movie_black_24dp,
+            R.drawable.ic_search_black_24dp,
             0,
-            R.drawable.ic_action_light_favorite,
-            R.drawable.ic_action_light_nopad_download,
+            R.drawable.ic_favorite_black_24dp,
+            R.drawable.ic_get_app_black_24dp,
             0,
-            R.drawable.ic_action_light_accounts,
-            R.drawable.ic_action_light_settings,
+            R.drawable.ic_account_circle_black_24dp,
+            R.drawable.ic_settings_black_24dp,
             0,
-            R.drawable.ic_action_light_web_site,
-            R.drawable.ic_action_light_web_site,
+            R.drawable.ic_public_black_24dp,
+            R.drawable.ic_public_black_24dp,
     };
 
 
@@ -163,7 +163,11 @@ public class MainActivity extends BaseActivity implements
         mLayoutInflater = LayoutInflater.from(this);
 
         mFragmentManager = getFragmentManager();
-        mActionBar = getActionBar();
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mActionBar = getSupportActionBar();
 
         // boolean play = Util.checkGooglePlayServices(this);
         boolean play = BaseCastManager.checkGooglePlayServices(this);
@@ -176,65 +180,24 @@ public class MainActivity extends BaseActivity implements
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
-                R.drawable.ic_material_drawer,  /* nav drawer icon to replace 'Up' caret */
+                toolbar,
                 R.string.app_name,  /* "open drawer" description */
                 R.string.app_name  /* "close drawer" description */
         ) {
 
-            /** Called when a drawer has settled in a completely closed state. */
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-
-                UiUtil.actionBarItemOnDrawerClosed(findViewById(R.id.search_menu_item));
-                UiUtil.actionBarItemOnDrawerClosed(mMediaRoute);
-
-                DrawerLayout.DrawerListener listener;
-                listener = (DrawerLayout.DrawerListener) mFragmentManager.findFragmentById(R.id.content_detail);
-                if (listener != null) {
-                    listener.onDrawerClosed(drawerView);
-                }
-                listener = (DrawerLayout.DrawerListener) mFragmentManager.findFragmentById(R.id.content_list);
-                if (listener != null) {
-                    listener.onDrawerClosed(drawerView);
-                }
             }
 
-            /** Called when a drawer has settled in a completely open state. */
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-
-                UiUtil.actionBarItemOnDrawerOpened(findViewById(R.id.search_menu_item));
-                UiUtil.actionBarItemOnDrawerOpened(mMediaRoute);
-
-                DrawerLayout.DrawerListener listener;
-                listener = (DrawerLayout.DrawerListener) mFragmentManager.findFragmentById(R.id.content_detail);
-                if (listener != null) {
-                    listener.onDrawerOpened(drawerView);
-                }
-                listener = (DrawerLayout.DrawerListener) mFragmentManager.findFragmentById(R.id.content_list);
-                if (listener != null) {
-                    listener.onDrawerOpened(drawerView);
-                }
             }
 
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
-
-                UiUtil.actionBarItemOnDrawerSlide(findViewById(R.id.search_menu_item), slideOffset);
-                UiUtil.actionBarItemOnDrawerSlide(mMediaRoute, slideOffset);
-
-                DrawerLayout.DrawerListener listener;
-                listener = (DrawerLayout.DrawerListener) mFragmentManager.findFragmentById(R.id.content_detail);
-                if (listener != null) {
-                    listener.onDrawerSlide(drawerView, slideOffset);
-                }
-                listener = (DrawerLayout.DrawerListener) mFragmentManager.findFragmentById(R.id.content_list);
-                if (listener != null) {
-                    listener.onDrawerSlide(drawerView, slideOffset);
-                }
             }
         };
 
@@ -349,6 +312,7 @@ public class MainActivity extends BaseActivity implements
                 }
 
                 mFragmentManager.beginTransaction()
+                        .setCustomAnimations(R.animator.no_op, R.animator.no_op)
                         .replace(R.id.content_list, VideoListFragment.newInstance(null), VIDEO_LIST_FRAGMENT)
                         .commit();
                 break;
@@ -364,6 +328,7 @@ public class MainActivity extends BaseActivity implements
                 }
 
                 mFragmentManager.beginTransaction()
+                        .setCustomAnimations(R.animator.no_op, R.animator.no_op)
                         .replace(R.id.content_list, GameListFragment.newInstance(), GAME_LIST_FRAGMENT)
                         .commit();
                 break;
@@ -379,6 +344,7 @@ public class MainActivity extends BaseActivity implements
                 }
 
                 mFragmentManager.beginTransaction()
+                        .setCustomAnimations(R.animator.no_op, R.animator.no_op)
                         .replace(R.id.content_list, UnarchivedListFragment.newInstance(), UNARCHIVED_LIST_FRAGMENT)
                         .commit();
                 break;

@@ -40,15 +40,13 @@
         android:id="@+id/menu_item_favorite"
         android:title="Add to Favorites"
         app:showAsAction="always"
-        android:icon="@drawable/ic_action_favorite_outline"
-        />
+        android:icon="@drawable/ic_favorite_outline_white_24dp" />
 
     <item
         android:id="@+id/menu_item_show_on_web"
         android:title="View game on the web"
         app:showAsAction="always"
-        android:icon="@drawable/ic_action_web_site"
-        />
+        android:icon="@drawable/ic_public_white_24dp" />
 
     <item
         android:id="@+id/menu_item_share"

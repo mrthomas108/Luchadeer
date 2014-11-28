@@ -32,6 +32,7 @@ package org.dforsyth.android.luchadeer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.widget.Toast;
@@ -47,11 +48,26 @@ public class VideoPlayerActivity extends BaseActivity {
 
     private static final String VIDEO_PLAYER_FRAGMENT_TAG = "video_player_fragment";
 
+    private int mStatusBarHeight;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_container_with_minicontroller);
+        // this isnt really what i want, but getting to a state where you can see the video and the cast _should_ be impossible?
+        setContentView(R.layout.activity_container_with_minicontroller_toolbar_overlay);
+
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        toolbar.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+
+        int resourceIdSB = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceIdSB > 0) {
+            mStatusBarHeight = getResources().getDimensionPixelSize(resourceIdSB);
+        }
+
+        toolbar.setTranslationY(mStatusBarHeight);
 
         Intent intent = getIntent();
 
@@ -70,7 +86,7 @@ public class VideoPlayerActivity extends BaseActivity {
                     .commit();
         }
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

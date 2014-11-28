@@ -30,8 +30,9 @@
 
 package org.dforsyth.android.luchadeer;
 
-import android.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 
@@ -50,13 +51,16 @@ public class DownloadsActivity extends BaseActivity implements DownloadsListFrag
 
         setContentView(R.layout.activity_container_with_minicontroller);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, DownloadsListFragment.newInstance())
                     .commit();
         }
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 

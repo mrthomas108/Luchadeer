@@ -55,8 +55,7 @@ public class ParallaxListView extends PaginatedListView {
     }
 
     private void setup() {
-        // setCacheColorHint(0);
-        // setScrollingCacheEnabled(false);
+        setDividerHeight(0);
         super.setOnScrollListener(new ParallaxOnScrollListener());
     }
 

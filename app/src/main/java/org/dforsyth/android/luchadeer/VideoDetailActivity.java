@@ -30,9 +30,10 @@
 
 package org.dforsyth.android.luchadeer;
 
-import android.app.ActionBar;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 
 import org.dforsyth.android.luchadeer.model.giantbomb.Video;
 import org.dforsyth.android.luchadeer.ui.video.VideoDetailFragment;
@@ -45,7 +46,13 @@ public class VideoDetailActivity extends BaseActivity implements VideoDetailFrag
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_container_with_minicontroller);
+        setContentView(R.layout.activity_container_with_minicontroller_toolbar_overlay);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // XXX since theme is broken right now
+        toolbar.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+
         if (savedInstanceState == null) {
             Video video = getIntent().getParcelableExtra(EXTRA_VIDEO_OBJ);
             int videoId = getIntent().getIntExtra(EXTRA_VIDEO_ID, 0);
@@ -62,7 +69,7 @@ public class VideoDetailActivity extends BaseActivity implements VideoDetailFrag
                     .commit();
         }
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
     }

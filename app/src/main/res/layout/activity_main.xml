@@ -37,16 +37,36 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity"
-    tools:ignore="MergeRootFrame">
+    tools:ignore="MergeRootFrame"
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                     android:id="@+id/content_list"
-                     android:layout_width="match_parent"
-                     android:layout_height="match_parent"/>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                android:id="@+id/toolbar"
+                layout="@layout/toobar" />
+
+            <!--
+            <android.support.v7.widget.Toolbar
+                android:id=”@+id/toolbar”
+                android:layout_height=”wrap_content”
+                android:layout_width=”match_parent”
+                android:minHeight=”?attr/actionBarSize”
+                android:background=”?attr/colorPrimary” />
+            -->
+
+            <FrameLayout android:id="@+id/content_list"
+                         android:layout_width="match_parent"
+                         android:layout_height="match_parent"/>
+
+        </LinearLayout>
 
         <com.google.sample.castcompanionlibrary.widgets.MiniController
             android:id="@+id/miniController1"
@@ -65,7 +85,8 @@
         android:layout_width="288dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@android:color/white">
+        android:background="@android:color/white"
+        android:fitsSystemWindows="true">
 
         <LinearLayout
             android:id="@+id/navdrawer"

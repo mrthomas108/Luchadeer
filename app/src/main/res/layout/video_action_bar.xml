@@ -34,7 +34,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize"
         android:gravity="center_vertical"
         android:background="@color/gb_grey"
         android:paddingLeft="15dp"
@@ -60,7 +60,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_action_favorite_outline"
+            android:src="@drawable/ic_favorite_outline_white_24dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:background="?selectableItemBackground"/>
@@ -70,14 +70,14 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_action_web_site"
+            android:src="@drawable/ic_public_white_24dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:background="?selectableItemBackground"/>
 
         <ImageView
             android:id="@+id/video_download"
-            android:src="@drawable/ic_action_download"
+            android:src="@drawable/ic_get_app_white_24dp"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"

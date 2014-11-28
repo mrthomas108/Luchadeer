@@ -31,8 +31,6 @@
 package org.dforsyth.android.luchadeer.ui.game;
 
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.AsyncTaskLoader;
@@ -45,6 +43,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -71,12 +71,12 @@ import com.android.volley.toolbox.RequestFuture;
 
 import org.dforsyth.android.luchadeer.ImageGalleryActivity;
 import org.dforsyth.android.luchadeer.R;
-import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.model.giantbomb.Game;
 import org.dforsyth.android.luchadeer.model.giantbomb.Image;
 import org.dforsyth.android.luchadeer.model.giantbomb.Platform;
 import org.dforsyth.android.luchadeer.model.giantbomb.SimpleNamedObject;
 import org.dforsyth.android.luchadeer.model.giantbomb.Video;
+import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.persist.LuchadeerPersist;
 import org.dforsyth.android.luchadeer.ui.util.BezelImageView;
 import org.dforsyth.android.luchadeer.ui.util.ObservableScrollView;
@@ -106,7 +106,7 @@ public class GameDetailFragment extends Fragment implements
 
     private static final int GAME_LOADER_ID = 2;
 
-    private Activity mActivity;
+    private ActionBarActivity mActivity;
 
     private Game mGame;
     private int mGameId;
@@ -177,7 +177,7 @@ public class GameDetailFragment extends Fragment implements
         super.onCreate(savedInstanceState);
 
         mGameId = getArguments().getInt(ARG_GAME_ID);
-        mActivity = getActivity();
+        mActivity = (ActionBarActivity) getActivity();
         mApi = LuchadeerApi.getInstance(mActivity.getApplicationContext());
         mPersist = LuchadeerPersist.getInstance(mActivity.getApplicationContext());
 
@@ -241,7 +241,7 @@ public class GameDetailFragment extends Fragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         Log.d(TAG, "onViewCreated");
 
-        mActionBar = mActivity.getActionBar();
+        mActionBar = mActivity.getSupportActionBar();
 
         setupActionBarBackgroundDrawable();
         setupAnimations();
@@ -281,7 +281,7 @@ public class GameDetailFragment extends Fragment implements
         // if we already know we're a favorite, update the icon (since we wouldn't have been able to
         // do it in setFavorite)
         if (mIsFavorite) {
-            mFavoriteMenuItem.setIcon(R.drawable.ic_action_favorite);
+            mFavoriteMenuItem.setIcon(R.drawable.ic_favorite_white_24dp);
         }
     }
 
@@ -704,9 +704,9 @@ public class GameDetailFragment extends Fragment implements
         mIsFavorite = favorite;
         if (mFavoriteMenuItem != null) {
             if (mIsFavorite) {
-                mFavoriteMenuItem.setIcon(R.drawable.ic_action_favorite);
+                mFavoriteMenuItem.setIcon(R.drawable.ic_favorite_white_24dp);
             } else {
-                mFavoriteMenuItem.setIcon(R.drawable.ic_action_favorite_outline);
+                mFavoriteMenuItem.setIcon(R.drawable.ic_favorite_outline_white_24dp);
             }
         }
     }

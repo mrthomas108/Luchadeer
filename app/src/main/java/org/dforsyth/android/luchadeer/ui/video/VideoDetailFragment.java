@@ -497,7 +497,7 @@ public class VideoDetailFragment extends Fragment implements
                 DownloadInfo info = mDownloadMap.get(quality);
                 if (info != null) {
                     tv.setCompoundDrawablesWithIntrinsicBounds(
-                            R.drawable.ic_action_download,
+                            R.drawable.ic_get_app_white_24dp,
                             0,
                             0,
                             0);
@@ -521,7 +521,7 @@ public class VideoDetailFragment extends Fragment implements
                 if (info != null) {
                     Log.d(TAG, "found info for " + getItem(position) + "(" + position + ")");
                     tv.setCompoundDrawablesWithIntrinsicBounds(
-                            R.drawable.ic_action_light_download,
+                            R.drawable.ic_get_app_white_24dp,
                             0,
                             0,
                             0);
@@ -567,9 +567,9 @@ public class VideoDetailFragment extends Fragment implements
         mIsFavorite = favorite;
         if (mFavorite != null) {
             if (mIsFavorite) {
-                mFavorite.setImageResource(R.drawable.ic_action_favorite);
+                mFavorite.setImageResource(R.drawable.ic_favorite_white_24dp);
             } else {
-                mFavorite.setImageResource(R.drawable.ic_action_favorite_outline);
+                mFavorite.setImageResource(R.drawable.ic_favorite_outline_white_24dp);
             }
         }
     }
@@ -638,16 +638,10 @@ public class VideoDetailFragment extends Fragment implements
         // TODO: we don't animation these becuase we cant animate on game details yet.
         if (mDetailsShown) {
             mLoadingView.setVisibility(View.GONE);
-            // mLoadingView.setAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
-
             mVerticalLayout.setVisibility(View.VISIBLE);
-            // mVerticalLayout.setAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
         } else {
             mLoadingView.setVisibility(View.VISIBLE);
-            // mLoadingView.setAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-
             mVerticalLayout.setVisibility(View.GONE);
-            // mVerticalLayout.setAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
         }
     }
 

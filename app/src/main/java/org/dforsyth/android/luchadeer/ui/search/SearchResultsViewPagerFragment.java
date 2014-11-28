@@ -30,9 +30,6 @@
 
 package org.dforsyth.android.luchadeer.ui.search;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -42,6 +39,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +53,7 @@ import org.dforsyth.android.luchadeer.SearchActivity;
 import org.dforsyth.android.luchadeer.model.giantbomb.SearchResult;
 import org.dforsyth.android.luchadeer.model.youtube.YouTubeVideo;
 import org.dforsyth.android.luchadeer.net.LuchadeerApi;
+import org.dforsyth.android.luchadeer.ui.util.SlidingTabLayout;
 import org.dforsyth.android.luchadeer.util.LoaderListResult;
 import org.dforsyth.android.luchadeer.util.LoaderResult;
 import org.dforsyth.android.luchadeer.util.Util;
@@ -63,8 +63,7 @@ import java.util.concurrent.ExecutionException;
 
 
 public class SearchResultsViewPagerFragment extends Fragment implements
-        SearchActivity.OnSearchQueryUpdatedListener,
-        ViewPager.OnPageChangeListener {
+        SearchActivity.OnSearchQueryUpdatedListener {
     private static final String TAG = SearchResultsViewPagerFragment.class.getName();
 
     private static final String ARG_QUERY = "query";
@@ -75,11 +74,12 @@ public class SearchResultsViewPagerFragment extends Fragment implements
     private static final int SEARCH_RESULTS_LOADER_ID = 3;
     private static final int YOUTUBE_RESULTS_LOADER_ID = 4;
 
-    private Activity mActivity;
+    private ActionBarActivity mActivity;
     private ActionBar mActionBar;
 
     private View rootView;
     private ViewPager mViewPager;
+    private SlidingTabLayout mTabLayout;
 
     private String mQuery;
     private ArrayList<SearchResult> mResults;
@@ -110,77 +110,37 @@ public class SearchResultsViewPagerFragment extends Fragment implements
     }
 
     @Override
-    public void onPageScrolled(int i, float v, int i2) {
-
-    }
-
-    @Override
-    public void onPageSelected(int i) {
-        mActionBar.setSelectedNavigationItem(i);
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int i) {
-
-    }
-
-    private class SearchResultsTabListener implements ActionBar.TabListener {
-
-        private int mItem;
-        private ViewPager mPager;
-
-        public SearchResultsTabListener(ViewPager pager, int item) {
-            mItem = item;
-            mPager = pager;
-        }
-
-        @Override
-        public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-            mPager.setCurrentItem(mItem);
-        }
-
-        @Override
-        public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
-        }
-
-        @Override
-        public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_search_results_view_pager, container, false);
 
         mViewPager  = (ViewPager) rootView.findViewById(R.id.results_pager);
 
-        mActivity = getActivity();
-        mActionBar = mActivity.getActionBar();
+        mActivity = (ActionBarActivity) getActivity();
+        mActionBar = mActivity.getSupportActionBar();
         mQuery = getArguments().getString(ARG_QUERY);
 
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.sliding_tab_layout);
 
-        mActionBar.addTab(
-                mActionBar.newTab()
-                        .setText(getString(R.string.tab_videos))
-                        .setTabListener(new SearchResultsTabListener(mViewPager, 0)));
-
-        mActionBar.addTab(
-                mActionBar.newTab()
-                        .setText(getString(R.string.tab_games))
-                        .setTabListener(new SearchResultsTabListener(mViewPager, 1)));
-        mActionBar.addTab(
-                mActionBar.newTab()
-                        .setText(getString(R.string.tab_unarchived))
-                        .setTabListener(new SearchResultsTabListener(mViewPager, 2)));
-
-        mViewPager.setOnPageChangeListener(this);
+        // mViewPager.setOnPageChangeListener(this);
         mViewPager.setAdapter(new PagerAdapter(getChildFragmentManager()));
 
         // XXX we need to do this because, frankly, this implementation is bad.
         mViewPager.setOffscreenPageLimit(3);
+
+        mTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+            @Override
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.white);
+            }
+
+            @Override
+            public int getDividerColor(int position) {
+                return getResources().getColor(R.color.white);
+            }
+        });
+        mTabLayout.setTextColor(getResources().getColor(R.color.white));
+
+        mTabLayout.setViewPager(mViewPager);
 
         return rootView;
     }
@@ -214,13 +174,6 @@ public class SearchResultsViewPagerFragment extends Fragment implements
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        mActionBar.removeAllTabs();
-    }
-
-    @Override
     public void onSearchQueryUpdated(String newQuery) {
         mQuery = newQuery;
         mResults = null;
@@ -237,6 +190,21 @@ public class SearchResultsViewPagerFragment extends Fragment implements
         public PagerAdapter(FragmentManager fm) {
             super(fm);
             mFragmentManager = fm;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case (0):
+                    return "Videos";
+                case (1):
+                    return "Games";
+                case (2):
+                    return "Unarchived";
+                default:
+            }
+
+            throw new RuntimeException("position is bad");
         }
 
         @Override
