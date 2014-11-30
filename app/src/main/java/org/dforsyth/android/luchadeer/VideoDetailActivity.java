@@ -72,6 +72,7 @@ public class VideoDetailActivity extends BaseActivity implements VideoDetailFrag
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.transparent_black_to_transparent_gradient));
     }
 
     @Override
