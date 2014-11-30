@@ -326,7 +326,7 @@ public class VideoCastNotificationService extends Service {
                 mCastManager.getDeviceName());
         rv.setTextViewText(R.id.subTitleView, castingTo);
         mNotification = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_action_notification)
+                .setSmallIcon(R.drawable.ic_cast_white_18dp)
                 .setContentIntent(resultPendingIntent)
                 .setContent(rv)
                 .setAutoCancel(false)
@@ -374,7 +374,7 @@ public class VideoCastNotificationService extends Service {
                 stackBuilder.getPendingIntent(NOTIFICATION_ID, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mNotification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_action_notification)
+                .setSmallIcon(R.drawable.ic_cast_white_18dp)
                 .setContentTitle(mm.getString(MediaMetadata.KEY_TITLE))
                 .setContentText(castingTo)
                 .setContentIntent(contentPendingIntent)
