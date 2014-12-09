@@ -45,6 +45,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 
+import org.dforsyth.android.luchadeer.BuildConfig;
 import org.dforsyth.android.luchadeer.CreditsActivity;
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.model.giantbomb.VideoType;
@@ -165,6 +166,11 @@ public class PreferencesFragment extends PreferenceFragment {
         } catch (PackageManager.NameNotFoundException e) {
             versionName = "";
         }
+
+        if (BuildConfig.DEBUG) {
+            versionName += "-debug";
+        }
+
         mAppVersion.setSummary(versionName);
 
         Preference mCredits = findPreference("app_credits");
