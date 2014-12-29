@@ -66,8 +66,6 @@ public class CastUtil {
             });
         }
 
-        sVideoCastManager.setContext(context);
-
         return sVideoCastManager;
     }
 }

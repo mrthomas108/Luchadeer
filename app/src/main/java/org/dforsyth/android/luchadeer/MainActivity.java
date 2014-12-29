@@ -220,7 +220,7 @@ public class MainActivity extends BaseActivity implements
             mSelectedUnarchivedId = savedInstanceState.getString(STATE_SELECTED_UNARCHIVED_ID);
         }
 
-        getVideoCastManager().reconnectSessionIfPossible(this, false, 3);
+        getVideoCastManager().reconnectSessionIfPossible();
     }
 
     protected void onPostCreate(Bundle savedInstanceState) {
