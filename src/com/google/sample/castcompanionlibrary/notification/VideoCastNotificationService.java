@@ -16,23 +16,6 @@
 
 package com.google.sample.castcompanionlibrary.notification;
 
-import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGD;
-import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
-
-import com.google.android.gms.cast.MediaInfo;
-import com.google.android.gms.cast.MediaMetadata;
-import com.google.android.gms.cast.MediaStatus;
-import com.google.sample.castcompanionlibrary.R;
-import com.google.sample.castcompanionlibrary.cast.VideoCastManager;
-import com.google.sample.castcompanionlibrary.cast.callbacks.VideoCastConsumerImpl;
-import com.google.sample.castcompanionlibrary.cast.exceptions.CastException;
-import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
-import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
-import com.google.sample.castcompanionlibrary.cast.player.VideoCastControllerActivity;
-import com.google.sample.castcompanionlibrary.utils.FetchBitmapTask;
-import com.google.sample.castcompanionlibrary.utils.LogUtils;
-import com.google.sample.castcompanionlibrary.utils.Utils;
-
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -49,6 +32,23 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
+
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaStatus;
+import com.google.sample.castcompanionlibrary.R;
+import com.google.sample.castcompanionlibrary.cast.VideoCastManager;
+import com.google.sample.castcompanionlibrary.cast.callbacks.VideoCastConsumerImpl;
+import com.google.sample.castcompanionlibrary.cast.exceptions.CastException;
+import com.google.sample.castcompanionlibrary.cast.exceptions.NoConnectionException;
+import com.google.sample.castcompanionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
+import com.google.sample.castcompanionlibrary.cast.player.VideoCastControllerActivity;
+import com.google.sample.castcompanionlibrary.utils.FetchBitmapTask;
+import com.google.sample.castcompanionlibrary.utils.LogUtils;
+import com.google.sample.castcompanionlibrary.utils.Utils;
+
+import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGD;
+import static com.google.sample.castcompanionlibrary.utils.LogUtils.LOGE;
 
 /**
  * A service to provide status bar Notifications when we are casting. For JB+ versions, notification
@@ -195,15 +195,17 @@ public class VideoCastNotificationService extends Service {
         mBitmapDecoderTask = new FetchBitmapTask(400, 400) {
             @Override
             protected void onPostExecute(Bitmap bitmap) {
-                try {
-                    mVideoArtBitmap = Utils.scaleCenterCrop(bitmap, 256, 256);
-                    build(info, mVideoArtBitmap, mIsPlaying);
-                } catch (CastException e) {
-                    LOGE(TAG, "Failed to set notification for " + info.toString(), e);
-                } catch (TransientNetworkDisconnectionException e) {
-                    LOGE(TAG, "Failed to set notification for " + info.toString(), e);
-                } catch (NoConnectionException e) {
-                    LOGE(TAG, "Failed to set notification for " + info.toString(), e);
+                if (bitmap != null) {
+                    try {
+                        mVideoArtBitmap = Utils.scaleCenterCrop(bitmap, 256, 256);
+                        build(info, mVideoArtBitmap, mIsPlaying);
+                    } catch (CastException e) {
+                        LOGE(TAG, "Failed to set notification for " + info.toString(), e);
+                    } catch (TransientNetworkDisconnectionException e) {
+                        LOGE(TAG, "Failed to set notification for " + info.toString(), e);
+                    } catch (NoConnectionException e) {
+                        LOGE(TAG, "Failed to set notification for " + info.toString(), e);
+                    }
                 }
                 if (mVisible) {
                     startForeground(NOTIFICATION_ID, mNotification);
