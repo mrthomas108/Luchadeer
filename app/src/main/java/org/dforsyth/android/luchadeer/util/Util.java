@@ -47,11 +47,15 @@ import com.android.volley.VolleyError;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.persist.LuchadeerPreferences;
 import org.dforsyth.android.luchadeer.service.PreferenceSyncService;
+import org.dforsyth.android.ravioli.encoders.DecodeError;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -171,9 +175,11 @@ public class Util {
     }
     */
 
+    // XXX all of this is garbage.
+
     // for now these handlers will just show toasts
-    public static void handleGiantBombError(Context context, LuchadeerApi.GiantBombVolleyError error) {
-        int statusCode = error.getResponse().getStatusCode();
+    public static void handleGiantBombError(Context context, LuchadeerApi.GiantBombResponse gbr) {
+        int statusCode = gbr.getStatusCode();
         switch (statusCode) {
             case (LuchadeerApi.GB_STATUS_OK):
                 return;
@@ -193,23 +199,45 @@ public class Util {
         }
     }
 
-    public static void handleVolleyError(Context context, Exception error) {
-        if (error instanceof TimeoutError) {
+    public static void handleRequestError(Context context, Exception error) {
+        if (error instanceof ExecutionException) {
+            handleVolleyError(context, (VolleyError) error.getCause());
+            return;
+        }
+
+        if (error instanceof VolleyError) {
+            handleVolleyError(context, (VolleyError) error);
+            return;
+        }
+    }
+
+    public static void handleVolleyError(Context context, VolleyError error) {
+        Exception cause = (Exception) error.getCause();
+
+        if (cause instanceof TimeoutError) {
             Toast.makeText(context, R.string.luchadeer_request_error, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        ExecutionException exception = (ExecutionException) error;
-        VolleyError cause = (VolleyError) exception.getCause();
-
-        if (cause instanceof LuchadeerApi.GiantBombVolleyError) {
-            handleGiantBombError(context, (LuchadeerApi.GiantBombVolleyError) cause);
-            return;
+        if (cause instanceof DecodeError) {
+            // try to handle a giantbomb error
+            // TODO: dont instantiate this here
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            try {
+                LuchadeerApi.GiantBombResponse gbr = gson.fromJson(
+                        ((DecodeError) cause).getData(),
+                        LuchadeerApi.GiantBombResponse.class
+                );
+                handleGiantBombError(context, gbr);
+                return;
+            } catch (JsonSyntaxException e) {
+                e.printStackTrace();
+            }
         }
 
         int statusCode = 0;
-        if (cause != null && cause.networkResponse != null) {
-            statusCode = cause.networkResponse.statusCode;
+        if (error.networkResponse != null) {
+            statusCode = error.networkResponse.statusCode;
         }
         switch (statusCode) {
             case (LuchadeerApi.LUCHA_STATUS_QUOTA_ERROR1):

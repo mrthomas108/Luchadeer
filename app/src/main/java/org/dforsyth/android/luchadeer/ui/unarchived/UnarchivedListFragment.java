@@ -43,14 +43,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
-import com.android.volley.toolbox.RequestFuture;
-
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.model.youtube.YouTubeVideo;
 import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.ui.util.ContentListFragment;
 import org.dforsyth.android.luchadeer.ui.util.PaginatedListView;
 import org.dforsyth.android.luchadeer.util.LoaderResult;
+import org.dforsyth.android.ravioli.RavioliResponse;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -151,25 +150,24 @@ public class UnarchivedListFragment extends ContentListFragment implements
 
         @Override
         public LoaderResult<LuchadeerApi.YouTubeListResponse> loadInBackground() {
-            RequestFuture<LuchadeerApi.YouTubeListResponse> future = RequestFuture.newFuture();
+            // RequestFuture<LuchadeerApi.YouTubeListResponse> future = RequestFuture.newFuture();
 
-            LuchadeerApi api = LuchadeerApi.getInstance(null);
+            LuchadeerApi api = LuchadeerApi.getInstance(getContext());
 
-            api.unarchivedVideos(this, future, future, mPageToken, null);
-
-            LuchadeerApi.YouTubeListResponse response = null;
+            RavioliResponse<LuchadeerApi.YouTubeListResponse> response = null;
             Exception error = null;
+
             try {
-                response = future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                error = e;
-            } catch (ExecutionException e) {
+                response = api.getUnarchivedVideos(
+                    mPageToken,
+                    null
+                ).request(this);
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
                 error = e;
             }
 
-            return new LoaderResult<LuchadeerApi.YouTubeListResponse>(response == null ? null : response, error);
+            return new LoaderResult<>(response == null ? null : response.getDecoded(), error);
         }
     }
 

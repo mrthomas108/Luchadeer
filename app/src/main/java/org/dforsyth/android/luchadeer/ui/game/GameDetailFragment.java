@@ -64,10 +64,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.NetworkImageView;
-import com.android.volley.toolbox.RequestFuture;
 
 import org.dforsyth.android.luchadeer.ImageGalleryActivity;
 import org.dforsyth.android.luchadeer.R;
@@ -85,6 +83,8 @@ import org.dforsyth.android.luchadeer.ui.util.UiUtil;
 import org.dforsyth.android.luchadeer.util.IntentUtil;
 import org.dforsyth.android.luchadeer.util.LoaderResult;
 import org.dforsyth.android.luchadeer.util.Util;
+import org.dforsyth.android.ravioli.RavioliRequest;
+import org.dforsyth.android.ravioli.RavioliResponse;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -616,27 +616,27 @@ public class GameDetailFragment extends Fragment implements
         showDetails(true);
     }
 
-    private void requestSimilarGame(int gameId, final BezelImageView view) {
+    private void requestSimilarGame(final int gameId, final BezelImageView view) {
         if (!mSimilarGamesBundle.containsKey(String.valueOf(gameId))) {
-            mApi.game(
-                    this,
-                    gameId,
-                    new Response.Listener<LuchadeerApi.GiantBombResponse<Game>>() {
-                        @Override
-                        public void onResponse(LuchadeerApi.GiantBombResponse<Game> response) {
-                            if (!response.statusIsOK()) {
-                                return;
-                            }
-                            onSimilarGameRequestComplete(response.getResults(), view);
+            mApi.getGame(
+                gameId
+            ).requestAsync(
+                this,
+                new RavioliRequest.Callbacks<LuchadeerApi.GiantBombResponse<Game>>() {
+                    @Override
+                    public void onSuccess(RavioliResponse<LuchadeerApi.GiantBombResponse<Game>> response) {
+                        LuchadeerApi.GiantBombResponse<Game> gameResponse = response.getDecoded();
+                        if (!gameResponse.statusIsOK()) {
+                            return;
                         }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            // fail quietly
-                            Log.d(TAG, "fetching similar game failed");
-                        }
+                        onSimilarGameRequestComplete(gameResponse.getResults(), view);
                     }
+
+                    @Override
+                    public void onFailure(VolleyError error) {
+                        Log.d(TAG, "fetching similar game failed");
+                    }
+                }
             );
         } else {
             onSimilarGameRequestComplete((Game) mSimilarGamesBundle.get(String.valueOf(gameId)), view);
@@ -657,21 +657,21 @@ public class GameDetailFragment extends Fragment implements
 
     private void requestRelatedVideo(int videoId, final BezelImageView view) {
         if (!mVideosBundle.containsKey(String.valueOf(videoId))) {
-            mApi.video(
-                    this,
-                    videoId,
-                    new Response.Listener<LuchadeerApi.GiantBombResponse<Video>>() {
-                        @Override
-                        public void onResponse(LuchadeerApi.GiantBombResponse<Video> response) {
-                            onRelatedVideoRequestComplete(response.getResults(), view);
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-                            Log.d(TAG, "fetching related video failed");
-                        }
+            mApi.getVideo(
+                videoId
+            ).requestAsync(
+                this,
+                new RavioliRequest.Callbacks<LuchadeerApi.GiantBombResponse<Video>>() {
+                    @Override
+                    public void onSuccess(RavioliResponse<LuchadeerApi.GiantBombResponse<Video>> response) {
+                        onRelatedVideoRequestComplete(response.getDecoded().getResults(), view);
                     }
+
+                    @Override
+                    public void onFailure(VolleyError error) {
+                        Log.d(TAG, "fetching related video failed");
+                    }
+                }
             );
         } else {
             onRelatedVideoRequestComplete((Video) mVideosBundle.get(String.valueOf(videoId)), view);
@@ -805,7 +805,7 @@ public class GameDetailFragment extends Fragment implements
         if (game != null) {
             onGameRequestComplete(game);
         } else {
-            Util.handleVolleyError(getActivity(), error);
+            Util.handleRequestError(getActivity(), error);
             onGameRequestFailed();
         }
         // we're done with this loader
@@ -830,24 +830,21 @@ public class GameDetailFragment extends Fragment implements
 
         @Override
         public LoaderResult<Game> loadInBackground() {
-            RequestFuture<LuchadeerApi.GiantBombResponse<Game>> future = RequestFuture.newFuture();
+            LuchadeerApi api = LuchadeerApi.getInstance(getContext());
 
-            LuchadeerApi.getInstance(getContext()).game(this, mGameId, future, future);
-
-            LuchadeerApi.GiantBombResponse<Game> response = null;
+            RavioliResponse<LuchadeerApi.GiantBombResponse<Game>> response = null;
             Exception error = null;
+
             try {
-                response = future.get();
-            } catch (InterruptedException e) {
+                response = api.getGame(
+                    mGameId
+                ).request(this);
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
-                error = e;
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-                // Util.handleVolleyError(getContext(), (VolleyError) e.getCause());
                 error = e;
             }
 
-            return new LoaderResult<Game>(response == null ? null : response.getResults(), error);
+            return new LoaderResult<Game>(response == null ? null : response.getDecoded().getResults(), error);
         }
 
         @Override

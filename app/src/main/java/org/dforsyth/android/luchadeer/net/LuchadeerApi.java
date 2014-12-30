@@ -36,23 +36,14 @@ import android.net.Uri;
 import android.util.Log;
 import android.util.LruCache;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.HttpStack;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.RequestFuture;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -65,9 +56,11 @@ import org.dforsyth.android.luchadeer.model.giantbomb.VideoType;
 import org.dforsyth.android.luchadeer.model.luchadeer.Preferences;
 import org.dforsyth.android.luchadeer.model.youtube.YouTubeVideo;
 import org.dforsyth.android.luchadeer.persist.LuchadeerPreferences;
+import org.dforsyth.android.ravioli.Ravioli;
+import org.dforsyth.android.ravioli.RavioliRequest;
+import org.dforsyth.android.ravioli.encoders.GsonEncoder;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
@@ -104,112 +97,10 @@ public class LuchadeerApi {
 
     // XXX having the imageloader in here isn't great, we should consider refactoring it out
     private ImageLoader mImageLoader;
-    private RequestQueue mRequestQueue;
     private RequestQueue mImageRequestQueue;
 
     public ImageLoader getImageLoader() {
         return mImageLoader;
-    }
-
-
-    private class GsonRequest<T> extends Request<T> {
-        private Type mClazz;
-        private Response.Listener<T> mListener;
-        private Gson mGson;
-
-        public GsonRequest(int method, String url, TypeToken<T> clazz, Response.Listener<T> listener,
-                           Response.ErrorListener errorListener) {
-            this(method, url, clazz, listener, errorListener, "yyyy-MM-dd HH:mm:ss");
-        }
-
-        public GsonRequest(int method, String url, TypeToken<T> clazz, Response.Listener<T> listener,
-                           Response.ErrorListener errorListener, String dateFormat) {
-            super(method, url, errorListener);
-            mClazz = clazz.getType();
-            mListener = listener;
-            mGson = new GsonBuilder().setDateFormat(dateFormat).create();
-        }
-
-        public Gson getGson() {
-            return mGson;
-        }
-
-        @Override
-        protected void deliverResponse(T response) {
-            mListener.onResponse(response);
-        }
-
-        @Override
-        protected Response<T> parseNetworkResponse(NetworkResponse networkResponse) {
-            Log.d(TAG, getUrl());
-
-            try {
-                String json = new String(networkResponse.data, HttpHeaderParser.parseCharset(networkResponse.headers));
-                // Log.d(TAG, json);
-                return Response.success((T)mGson.fromJson(json, mClazz), HttpHeaderParser.parseCacheHeaders(networkResponse));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                return Response.error(new ParseError(networkResponse));
-            }
-        }
-    }
-
-    // special case request so we can parse error responses -- the api returns the wrong result type when state code != 1
-    public class GiantBombRequest<T> extends GsonRequest<GiantBombResponse<T>> {
-        private Type mClazz;
-
-        public GiantBombRequest(int method, String url, TypeToken<GiantBombResponse<T>> clazz, Response.Listener<GiantBombResponse<T>> listener, Response.ErrorListener errorListener) {
-            super(method, url, clazz, listener, errorListener);
-            mClazz = clazz.getType();
-        }
-
-        @Override
-        protected Response<GiantBombResponse<T>> parseNetworkResponse(NetworkResponse networkResponse) {
-            Log.d(TAG, getUrl());
-
-            String json;
-            try {
-                json = new String(networkResponse.data, HttpHeaderParser.parseCharset(networkResponse.headers));
-                // wrap this in an IllegalStateException catch so that we can catch errors from the api with an error response
-                // (since error always returns a dictionary result instead of a list).
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                return Response.error(new ParseError(networkResponse));
-            }
-
-            GiantBombResponse<T> response;
-            try {
-                response = (GiantBombResponse<T>)getGson().fromJson(json, mClazz);
-            } catch (JsonSyntaxException e) {
-                return Response.error(new GiantBombVolleyError(getGson(), json));
-            }
-
-            if (response == null) {
-                return Response.error(new GiantBombVolleyError(getGson(), json));
-            }
-
-            if (response.getStatusCode() != GB_STATUS_OK) {
-                return Response.error(new GiantBombVolleyError(response));
-            }
-
-            return Response.success(response, HttpHeaderParser.parseCacheHeaders(networkResponse));
-        }
-    }
-
-    public static class GiantBombVolleyError extends VolleyError {
-        private  GiantBombResponse mResponse;
-
-        public GiantBombVolleyError(Gson gson, String json) {
-            mResponse = gson.fromJson(json, new TypeToken<GiantBombResponse>(){}.getType());
-        }
-
-        public GiantBombVolleyError(GiantBombResponse response) {
-            mResponse = response;
-        }
-
-        public GiantBombResponse<Object> getResponse() {
-            return mResponse;
-        }
     }
 
     public class GiantBombResponse<T> {
@@ -240,13 +131,16 @@ public class LuchadeerApi {
         }
     }
 
+    private static Ravioli mGiantBombClient;
+    private static Ravioli mYouTubeClient;
+    private static Ravioli mValidateClient;
+
     private LuchadeerApi(Context context) {
         // VolleyLog.DEBUG = true;
         mContext = context.getApplicationContext();
 
         mPreferences = LuchadeerPreferences.getInstance(mContext);
 
-        mRequestQueue = Volley.newRequestQueue(mContext);
         mImageRequestQueue = Volley.newRequestQueue(mContext);
 
         mImageLoader = new ImageLoader(mImageRequestQueue, new ImageLoader.ImageCache() {
@@ -261,17 +155,44 @@ public class LuchadeerApi {
 
         // set up uris and read api key out of preferences
         setupURIs();
-        reloadApiKey();
+        reloadApiKey(); // this will init the rail clients
 
-        mRequestQueue.start();
         mImageRequestQueue.start();
+    }
+
+    private Ravioli makeGiantBombClient() {
+        return new Ravioli.Builder(
+                mContext,
+                GiantBombUriBuilder().build()
+        )
+        .setEncoder(new GsonEncoder(new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create()))
+        .build();
+    }
+
+    private Ravioli makeYouTubeClient() {
+        return new Ravioli.Builder(
+                mContext,
+                Uri.parse(LUCHADEER_BASE_URL).buildUpon()
+                        .appendPath("youtube")
+                        .appendPath("unarchived_videos")
+                        .build()
+        )
+        .setEncoder(new GsonEncoder(new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss'.000Z'").create()))
+        .build();
+    }
+
+    private Ravioli makeValidateClient() {
+        return new Ravioli.Builder(
+            mContext,
+            Uri.parse(LINKED_BASE_URL)
+        )
+        .build();
     }
 
     public LuchadeerApi(Context context, HttpStack stack, LuchadeerPreferences preferences) {
         mContext = context;
 
         mPreferences = preferences;
-        mRequestQueue = Volley.newRequestQueue(mContext, stack);
         mImageRequestQueue = Volley.newRequestQueue(mContext, stack);
         mImageLoader = new ImageLoader(mImageRequestQueue, new ImageLoader.ImageCache() {
             private final LruCache<String, Bitmap> mCache = new LruCache<String, Bitmap>(IMAGE_CACHE_SIZE);
@@ -287,7 +208,6 @@ public class LuchadeerApi {
         setupURIs();
         reloadApiKey();
 
-        mRequestQueue.start();
         mImageRequestQueue.start();
     }
 
@@ -309,6 +229,10 @@ public class LuchadeerApi {
     public void reloadApiKey() {
         mApiKey = mPreferences.getApiKey();
         mBaseUrl = mApiKey.isEmpty() ? UNLINKED_BASE_URL : LINKED_BASE_URL;
+
+        mGiantBombClient = makeGiantBombClient();
+        mYouTubeClient = makeYouTubeClient();
+        mValidateClient = makeValidateClient();
     }
 
     public String getApiKey() {
@@ -321,215 +245,133 @@ public class LuchadeerApi {
             .appendQueryParameter("api_key", mApiKey);
     }
 
-    public void videos(Object tag,
-                       String categoryId,
-                       int offset,
-                       Response.Listener<GiantBombResponse<ArrayList<Video>>> responseListener,
-                       Response.ErrorListener errorListener) {
+    public RavioliRequest<GiantBombResponse<ArrayList<Video>>> getVideos(String categoryId, int offset) {
+        RavioliRequest.Builder <GiantBombResponse<ArrayList<Video>>> builder = new RavioliRequest.Builder<GiantBombResponse<ArrayList<Video>>>(
+                mGiantBombClient,
+                new TypeToken<GiantBombResponse<ArrayList<Video>>>(){}.getType()
+        )
+        .addPath("videos")
+        .addQueryParameter("offset", Integer.toString(offset));
 
-        Uri.Builder builder = GiantBombUriBuilder();
-        builder = builder.appendEncodedPath("videos/")
-                .appendQueryParameter("offset", Integer.toString(offset));
-
-        if (categoryId != null && !categoryId.isEmpty()) {
-            builder = builder.appendQueryParameter("video_type", categoryId);
+        if (categoryId != null) {
+            builder = builder.addQueryParameter("video_type", categoryId);
         }
 
-        String url = builder.build().toString();
-
-        GiantBombRequest<ArrayList<Video>> r = new GiantBombRequest<ArrayList<Video>>(
-                Request.Method.GET,
-                url,
-                new TypeToken<GiantBombResponse<ArrayList<Video>>>(){},
-                responseListener,
-                errorListener);
-        r.setTag(tag);
-
-        mRequestQueue.add(r);
+        return builder.build();
     }
 
-    public void video(Object tag,
-                      int videoId,
-                      Response.Listener<GiantBombResponse<Video>> responseListener,
-                      Response.ErrorListener errorListener) {
-
-        String url = GiantBombUriBuilder()
-                .appendEncodedPath("video/")
-                .appendPath(Integer.toString(videoId) + "/")
-                .build().toString();
-
-        GiantBombRequest<Video> r = new GiantBombRequest<Video>(
-                Request.Method.GET,
-                url,
-                new TypeToken<GiantBombResponse<Video>>(){},
-                responseListener,
-                errorListener);
-        r.setTag(tag);
-
-        mRequestQueue.add(r);
+    public RavioliRequest<GiantBombResponse<Video>> getVideo(int videoId) {
+        return new RavioliRequest.Builder<GiantBombResponse<Video>>(
+                mGiantBombClient,
+                new TypeToken<GiantBombResponse<Video>>(){}.getType()
+        )
+        .addPath("video/")
+        .addPath(Integer.toString(videoId) + "/")
+        .build();
     }
 
-    public void validate(String linkCode, Response.Listener<ApiKey> responseListener,
-                         Response.ErrorListener errorListener) {
-
-        // this one breaks if there is a trailing slash...
-        String url = Uri.parse(LINKED_BASE_URL).buildUpon()
-                .appendPath("validate")
-                .appendQueryParameter("link_code", linkCode)
-                .appendQueryParameter("format", "json").build().toString();
-
-        GsonRequest<ApiKey> r = new GsonRequest<ApiKey>(
-                Request.Method.GET,
-                url,
-                new TypeToken<ApiKey>(){},
-                responseListener,
-                errorListener);
-
-        mRequestQueue.add(r);
+    public RavioliRequest<ApiKey> getValidate(String linkCode) {
+        return new RavioliRequest.Builder<ApiKey>(
+            mValidateClient,
+            ApiKey.class
+        )
+        .addPath("validate")
+        .addQueryParameter("link_code", linkCode)
+        .addQueryParameter("format", "json")
+        .build();
     }
 
-    public void videoTypes(Object tag,
-                           Response.Listener<GiantBombResponse<ArrayList<VideoType>>> responseListener,
-                           Response.ErrorListener errorListener) {
-
-        String url = GiantBombUriBuilder().appendEncodedPath("video_types/").build().toString();
-
-        Log.d(TAG, url);
-
-
-        GiantBombRequest<ArrayList<VideoType>> r = new GiantBombRequest<ArrayList<VideoType>>(
-                Request.Method.GET,
-                url,
-                new TypeToken<GiantBombResponse<ArrayList<VideoType>>>(){},
-                responseListener,
-                errorListener);
-
-        r.setTag(tag);
-
-        mRequestQueue.add(r);
+    public RavioliRequest<GiantBombResponse<ArrayList<VideoType>>> getVideoTypes() {
+        return new RavioliRequest.Builder<GiantBombResponse<ArrayList<VideoType>>>(
+                mGiantBombClient,
+            new TypeToken<GiantBombResponse<ArrayList<VideoType>>>(){}.getType()
+        )
+        .addPath("video_types/")
+        .build();
     }
 
-    public void games(Object tag,
-                      int offset,
-                      Response.Listener<GiantBombResponse<ArrayList<Game>>> responseListener,
-                      Response.ErrorListener errorListener) {
-
-        String url = GiantBombUriBuilder()
-                .appendEncodedPath("games/")
-                .appendQueryParameter("sort", "date_added:desc")
-                .appendQueryParameter("offset", Integer.toString(offset))
-                .build().toString();
-
-        GiantBombRequest<ArrayList<Game>> r = new GiantBombRequest<ArrayList<Game>>(
-                Request.Method.GET,
-                url,
-                new TypeToken<GiantBombResponse<ArrayList<Game>>>(){},
-                responseListener,
-                errorListener);
-
-        // this is request can be crazy slow from giantbomb -- we retry a few times but we don't back off
-        r.setRetryPolicy(new DefaultRetryPolicy(
-                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
-                GAME_LIST_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        ));
-
-        r.setTag(tag);
-
-        mRequestQueue.add(r);
+    public RavioliRequest<GiantBombResponse<ArrayList<Game>>> getGames(int offset) {
+        return new RavioliRequest.Builder<GiantBombResponse<ArrayList<Game>>>(
+                mGiantBombClient,
+            new TypeToken<GiantBombResponse<ArrayList<Game>>>(){}.getType()
+        )
+        .addPath("games/")
+        .addQueryParameter("sort", "date_added:desc")
+        .addQueryParameter("offset", Integer.toString(offset))
+        .setRetryPolicy(new DefaultRetryPolicy(
+            DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
+            GAME_LIST_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ))
+        .build();
     }
 
-    public void game(Object tag,
-                     int gameId,
-                     Response.Listener<GiantBombResponse<Game>> responseListener,
-                     Response.ErrorListener errorListener) {
-
-        String url = GiantBombUriBuilder()
-                .appendEncodedPath("game/")
-                .appendPath(Integer.toString(gameId) + "/")
-                .build().toString();
-
-        GiantBombRequest<Game> r = new GiantBombRequest<Game>(
-                Request.Method.GET,
-                url,
-                new TypeToken<GiantBombResponse<Game>>(){},
-                responseListener,
-                errorListener);
-
-        r.setTag(tag);
-
-        mRequestQueue.add(r);
+    public RavioliRequest<GiantBombResponse<Game>> getGame(int gameId) {
+        return new RavioliRequest.Builder<GiantBombResponse<Game>>(
+                mGiantBombClient,
+            new TypeToken<GiantBombResponse<Game>>(){}.getType()
+        )
+        .addPath("game/")
+        .addPath(Integer.toString(gameId) + "/")
+        .build();
     }
 
-    public void search(Object tag,
-                       String query,
-                       String[] resources,
-                       Response.Listener<GiantBombResponse<ArrayList<SearchResult>>> responseListener,
-                       Response.ErrorListener errorListener) {
-
-        // dont have StringJoiner
-        String resourceList = "";
+    public RavioliRequest<GiantBombResponse<ArrayList<SearchResult>>> getSearch(String query, String[] resources) {
+        StringBuilder resourcesBuilder = new StringBuilder();
         if (resources != null) {
             for (String resource : resources) {
-                resourceList += resource + ",";
+                resourcesBuilder.append(resource);
+                resourcesBuilder.append(",");
             }
         }
 
-        Uri.Builder builder = GiantBombUriBuilder()
-                .appendEncodedPath("search/")
-                .appendQueryParameter("query", query);
-        if (!resourceList.isEmpty()) {
-            builder.appendQueryParameter("resources", resourceList);
-        }
-
-        String url = builder.build().toString();
-
-        GiantBombRequest<ArrayList<SearchResult>> r = new GiantBombRequest<ArrayList<SearchResult>>(
-                Request.Method.GET,
-                url,
-                new TypeToken<GiantBombResponse<ArrayList<SearchResult>>>(){},
-                responseListener,
-                errorListener);
-
-        // this is request can be crazy slow from giantbomb -- we retry a few times
-        r.setRetryPolicy(new DefaultRetryPolicy(
-                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
-                GAME_LIST_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        RavioliRequest.Builder<GiantBombResponse<ArrayList<SearchResult>>> builder = new RavioliRequest.Builder<GiantBombResponse<ArrayList<SearchResult>>>(
+                mGiantBombClient,
+            new TypeToken<GiantBombResponse<ArrayList<SearchResult>>>(){}.getType()
+        )
+        .addPath("search/")
+        .addQueryParameter("query", query)
+        .setRetryPolicy(new DefaultRetryPolicy(
+            DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
+            GAME_LIST_RETRIES,
+            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         ));
 
-        r.setTag(tag);
+        if (resourcesBuilder.length() > 0) {
+            builder = builder.addQueryParameter("resources", resourcesBuilder.toString());
+        }
 
-        mRequestQueue.add(r);
+        return builder.build();
     }
 
     public void cancelRequests(Object tag) {
-        mRequestQueue.cancelAll(tag);
+        mGiantBombClient.cancel(tag);
         Log.d(TAG, "canceled requests for " + tag);
     }
 
-    public RequestFuture<String> setPreferencesFuture(final Preferences preferences) {
-        RequestFuture<String> future = RequestFuture.newFuture();
-        String url = LUCHADEER_BASE_URL + "/preferences";
-        StringRequest request = new StringRequest(
-                Request.Method.POST,
-                url,
-                future,
-                future) {
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                try {
-                    return new Gson().toJson(preferences).getBytes("utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
+    public RavioliRequest<String> setPreferencesFuture(final Preferences preferences) {
+        Ravioli mPreferenceClient = new Ravioli.Builder(
+                mContext,
+                Uri.parse(LUCHADEER_BASE_URL)
+        ).build();
 
-        mRequestQueue.add(request);
+        byte[] bytes;
+        try {
+            bytes = new Gson().toJson(preferences).getBytes("utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            // then the caller will npe, but that's fine in this case because something is really wrong.
+            return null;
+        }
 
-        return future;
+        return new RavioliRequest.Builder<String>(
+            mPreferenceClient,
+            String.class
+        )
+        .addPath("preferences")
+        .setMethod(Request.Method.POST)
+        .setBody(bytes)
+        .build();
     }
 
     public class YouTubeListResponse {
@@ -558,35 +400,18 @@ public class LuchadeerApi {
         }
     }
 
-    public void unarchivedVideos(
-            Object tag,
-            Response.Listener<YouTubeListResponse> listener,
-            Response.ErrorListener errorListener,
-            String nextPageToken,
-            String query) {
-
-        Uri.Builder builder = Uri.parse(LUCHADEER_BASE_URL).buildUpon()
-                .appendPath("youtube")
-                .appendPath("unarchived_videos");
-
-        if (nextPageToken != null) {
-            builder.appendQueryParameter("pageToken", nextPageToken);
-        }
-        if (query != null) {
-            builder.appendQueryParameter("q", query);
-        }
-        String uri = builder.build().toString();
-
-        Request<YouTubeListResponse> r = new GsonRequest<YouTubeListResponse>(
-                Request.Method.GET,
-                uri,
-                new TypeToken<YouTubeListResponse>(){},
-                listener,
-                errorListener,
-                "yyyy-MM-dd'T'HH:mm:ss'.000Z'"
+    public RavioliRequest<YouTubeListResponse> getUnarchivedVideos(String nextPageToken, String query) {
+        RavioliRequest.Builder<YouTubeListResponse> builder = new RavioliRequest.Builder<>(
+            mYouTubeClient,
+            new TypeToken<YouTubeListResponse>(){}.getType()
         );
-        r.setTag(tag);
+        if (query != null) {
+            builder = builder.addQueryParameter("q", query);
+        }
+        if (nextPageToken != null) {
+            builder = builder.addQueryParameter("pageToken", nextPageToken);
+        }
 
-        mRequestQueue.add(r);
+        return builder.build();
     }
 }

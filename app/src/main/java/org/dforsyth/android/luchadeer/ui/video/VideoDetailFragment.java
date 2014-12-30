@@ -64,13 +64,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.RequestFuture;
 import com.google.sample.castcompanionlibrary.cast.VideoCastManager;
 
 import org.dforsyth.android.luchadeer.BaseActivity;
 import org.dforsyth.android.luchadeer.R;
-import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.model.giantbomb.Video;
+import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.persist.LuchadeerPersist;
 import org.dforsyth.android.luchadeer.persist.db.LuchadeerContract;
 import org.dforsyth.android.luchadeer.persist.provider.BatchContentObserver;
@@ -81,6 +80,7 @@ import org.dforsyth.android.luchadeer.util.IntentUtil;
 import org.dforsyth.android.luchadeer.util.LoaderResult;
 import org.dforsyth.android.luchadeer.util.Util;
 import org.dforsyth.android.luchadeer.util.VideoUtil;
+import org.dforsyth.android.ravioli.RavioliResponse;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -401,7 +401,7 @@ public class VideoDetailFragment extends Fragment implements
         if (video != null) {
             onVideoRequestComplete(video);
         } else {
-            Util.handleVolleyError(getActivity(), error);
+            Util.handleRequestError(getActivity(), error);
             onVideoRequestFailed();
         }
         // done with this loader
@@ -739,24 +739,23 @@ public class VideoDetailFragment extends Fragment implements
 
         @Override
         public LoaderResult<Video> loadInBackground() {
-            RequestFuture<LuchadeerApi.GiantBombResponse<Video>> future = RequestFuture.newFuture();
+            LuchadeerApi api = LuchadeerApi.getInstance(getContext());
 
-            LuchadeerApi.getInstance(getContext()).video(this, mVideoId, future, future);
-
-            LuchadeerApi.GiantBombResponse<Video> response = null;
+            RavioliResponse<LuchadeerApi.GiantBombResponse<Video>> response = null;
+            LuchadeerApi.GiantBombResponse<Video> gbr = null;
             Exception error = null;
             try {
-                response = future.get();
-            } catch (InterruptedException e) {
+                response = api.getVideo(
+                    mVideoId
+                ).request(this);
+                gbr = response.getDecoded();
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
                 error = e;
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-                error = e;
-                // Util.handleVolleyError(getContext(), (VolleyError) e.getCause());
             }
 
-            return new LoaderResult<Video>(response == null ? null : response.getResults(), error);
+
+            return new LoaderResult<Video>(response == null ? null : gbr.getResults(), error);
         }
 
         @Override

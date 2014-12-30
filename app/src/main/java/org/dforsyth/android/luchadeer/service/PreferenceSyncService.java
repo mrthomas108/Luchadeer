@@ -34,15 +34,12 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
-import com.android.volley.toolbox.RequestFuture;
-
-import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.model.luchadeer.Preferences;
+import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.persist.LuchadeerPreferences;
+import org.dforsyth.android.ravioli.RavioliResponse;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 
 public class PreferenceSyncService extends IntentService {
@@ -60,19 +57,13 @@ public class PreferenceSyncService extends IntentService {
         LuchadeerPreferences preferences = LuchadeerPreferences.getInstance(this);
         Preferences userPreferences = preferences.forUpload();
 
-        RequestFuture<String> future = api.setPreferencesFuture(userPreferences);
-
-        String response = "";
+        RavioliResponse<String> response = null;
         try {
-            response = future.get(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
+            response = api.setPreferencesFuture(userPreferences).request();
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
 
-        Log.d(TAG, "setpreferences response: " + response);
+        Log.d(TAG, "setpreferences response " + (response == null ? "error" : "success"));
     }
 }

@@ -47,8 +47,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.android.volley.toolbox.RequestFuture;
-
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.SearchActivity;
 import org.dforsyth.android.luchadeer.model.giantbomb.Game;
@@ -57,10 +55,12 @@ import org.dforsyth.android.luchadeer.ui.util.ContentListFragment;
 import org.dforsyth.android.luchadeer.ui.util.PaginatedListView;
 import org.dforsyth.android.luchadeer.ui.util.ParallaxListView;
 import org.dforsyth.android.luchadeer.util.LoaderListResult;
-import org.dforsyth.android.luchadeer.util.OffsetListLoader;
+import org.dforsyth.android.luchadeer.util.OffsetListLoader2;
 import org.dforsyth.android.luchadeer.util.Util;
+import org.dforsyth.android.ravioli.RavioliResponse;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class GameListFragment extends ContentListFragment implements
@@ -171,14 +171,14 @@ public class GameListFragment extends ContentListFragment implements
             return;
         }
 
-        ArrayList<Game> games = result.getResult();
+        List<Game> games = result.getResult();
         Exception error = result.getError();
 
         if (games != null) {
             GamesListLoader loader = (GamesListLoader) arrayListloader;
             onGamesRequestCompleted(games, loader.getAvailableItemCount());
         } else {
-            Util.handleVolleyError(getActivity(), error);
+            Util.handleRequestError(getActivity(), error);
             onGamesRequestFailed();
         }
     }
@@ -213,7 +213,7 @@ public class GameListFragment extends ContentListFragment implements
         mSwipeRefreshLayout.setEnabled(true);
     }
 
-    private void onGamesRequestCompleted(ArrayList<Game> games, int totalResults) {
+    private void onGamesRequestCompleted(List<Game> games, int totalResults) {
         if (mArrayAdapter == null) {
             mArrayAdapter = new GameArrayAdapter(getActivity());
             setListAdapter(mArrayAdapter);
@@ -273,15 +273,20 @@ public class GameListFragment extends ContentListFragment implements
         outState.putInt(STATE_TOTAL_RESULTS, mTotalResults);
     }
 
-    private static class GamesListLoader extends OffsetListLoader<Game> {
+    private static class GamesListLoader extends OffsetListLoader2<Game> {
 
         public GamesListLoader(Context context, int initialOffset) {
             super(context, initialOffset);
         }
 
         @Override
-        public void makeRequest(RequestFuture<LuchadeerApi.GiantBombResponse<ArrayList<Game>>> future, int offset) {
-            LuchadeerApi.getInstance(getContext()).games(this, offset, future, future);
+        public LuchadeerApi.GiantBombResponse<ArrayList<Game>> doRequest(int offset) throws Exception {
+            LuchadeerApi api = LuchadeerApi.getInstance(getContext());
+            RavioliResponse<LuchadeerApi.GiantBombResponse<ArrayList<Game>>> response = api.getGames(
+                offset
+            ).request(this);
+
+            return response.getDecoded();
         }
     }
 }

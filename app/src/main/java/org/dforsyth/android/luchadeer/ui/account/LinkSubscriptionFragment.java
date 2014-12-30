@@ -43,13 +43,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
 import org.dforsyth.android.luchadeer.R;
-import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.model.giantbomb.ApiKey;
+import org.dforsyth.android.luchadeer.net.LuchadeerApi;
 import org.dforsyth.android.luchadeer.persist.LuchadeerPreferences;
+import org.dforsyth.android.ravioli.RavioliRequest;
+import org.dforsyth.android.ravioli.RavioliResponse;
 
 
 public class LinkSubscriptionFragment extends DialogFragment {
@@ -105,6 +106,7 @@ public class LinkSubscriptionFragment extends DialogFragment {
     }
 
     private void validateLinkCode(String linkCode) {
+        /*
         mApi.validate(
                 linkCode,
                 new Response.Listener<ApiKey>() {
@@ -118,6 +120,22 @@ public class LinkSubscriptionFragment extends DialogFragment {
                     public void onErrorResponse(VolleyError volleyError) {
                         onValidateRequestFailed();
                     }
+        });
+        */
+
+        mApi.getValidate(
+                linkCode
+        )
+        .requestAsync(this, new RavioliRequest.Callbacks<ApiKey>() {
+            @Override
+            public void onSuccess(RavioliResponse<ApiKey> response) {
+                onValidateRequestCompleted(response.getDecoded());
+            }
+
+            @Override
+            public void onFailure(VolleyError error) {
+                onValidateRequestFailed();
+            }
         });
     }
 

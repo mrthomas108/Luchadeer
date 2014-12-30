@@ -47,9 +47,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.RequestFuture;
 
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.model.giantbomb.Video;
@@ -63,9 +61,11 @@ import org.dforsyth.android.luchadeer.ui.util.ContentListFragment;
 import org.dforsyth.android.luchadeer.ui.util.PaginatedListView;
 import org.dforsyth.android.luchadeer.ui.util.ParallaxListView;
 import org.dforsyth.android.luchadeer.util.LoaderListResult;
-import org.dforsyth.android.luchadeer.util.OffsetListLoader;
+import org.dforsyth.android.luchadeer.util.OffsetListLoader2;
 import org.dforsyth.android.luchadeer.util.Util;
 import org.dforsyth.android.luchadeer.util.VideoUtil;
+import org.dforsyth.android.ravioli.RavioliRequest;
+import org.dforsyth.android.ravioli.RavioliResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -269,7 +269,7 @@ public class VideoListFragment extends ContentListFragment implements
 
     @Override
     public Loader<LoaderListResult<Video>> onCreateLoader(int i, Bundle bundle) {
-        return new VideosListLoader(getActivity(), isRefreshing() ? 0 : mOffset, mCategoryId);
+        return new VideoListLoader(getActivity(), isRefreshing() ? 0 : mOffset, mCategoryId);
     }
 
     @Override
@@ -283,10 +283,10 @@ public class VideoListFragment extends ContentListFragment implements
         Exception error = result.getError();
 
         if (videos != null) {
-            VideosListLoader loader = (VideosListLoader) arrayListLoader;
+            VideoListLoader loader = (VideoListLoader) arrayListLoader;
             onVideosRequestCompleted(videos, loader.getAvailableItemCount(), videos.size());
         } else {
-            Util.handleVolleyError(getActivity(), error);
+            Util.handleRequestError(getActivity(), error);
             onRequestVideosFailed();
         }
     }
@@ -443,20 +443,20 @@ public class VideoListFragment extends ContentListFragment implements
     }
 
     private void requestVideoTypes() {
-        mApi.videoTypes(
+        mApi.getVideoTypes().requestAsync(
                 this,
-                new Response.Listener<LuchadeerApi.GiantBombResponse<ArrayList<VideoType>>>() {
+                new RavioliRequest.Callbacks<LuchadeerApi.GiantBombResponse<ArrayList<VideoType>>>() {
                     @Override
-                    public void onResponse(LuchadeerApi.GiantBombResponse<ArrayList<VideoType>> response) {
-                        onVideoTypesRequestCompleted(response.getResults());
+                    public void onSuccess(RavioliResponse<LuchadeerApi.GiantBombResponse<ArrayList<VideoType>>> response) {
+                        onVideoTypesRequestCompleted(response.getDecoded().getResults());
                     }
-                },
-                new Response.ErrorListener() {
+
                     @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        onRequestVideoTypesFailed();
+                    public void onFailure(VolleyError error) {
+                        onRequestVideosFailed();
                     }
-                });
+                }
+        );
     }
 
     private void onRequestVideoTypesFailed() {
@@ -545,17 +545,23 @@ public class VideoListFragment extends ContentListFragment implements
         mOnVideoSelectedListener = onVideoSelectedListener;
     }
 
-    private static class VideosListLoader extends OffsetListLoader<Video> {
+    private static class VideoListLoader extends OffsetListLoader2<Video> {
         private String mCategory;
 
-        public VideosListLoader(Context context, int initialOffset, String category) {
+        public VideoListLoader(Context context, int initialOffset, String category) {
             super(context, initialOffset);
             mCategory = category;
         }
 
         @Override
-        public void makeRequest(RequestFuture<LuchadeerApi.GiantBombResponse<ArrayList<Video>>> future, int offset) {
-            LuchadeerApi.getInstance(getContext()).videos(this, mCategory, offset, future, future);
+        public LuchadeerApi.GiantBombResponse<ArrayList<Video>> doRequest(int offset) throws Exception {
+            LuchadeerApi api = LuchadeerApi.getInstance(getContext());
+            RavioliResponse<LuchadeerApi.GiantBombResponse<ArrayList<Video>>> response = api.getVideos(
+                    mCategory,
+                    offset
+            ).request(this);
+
+            return response.getDecoded();
         }
     }
 }

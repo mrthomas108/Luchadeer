@@ -46,8 +46,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.android.volley.toolbox.RequestFuture;
-
 import org.dforsyth.android.luchadeer.R;
 import org.dforsyth.android.luchadeer.SearchActivity;
 import org.dforsyth.android.luchadeer.model.giantbomb.SearchResult;
@@ -57,6 +55,7 @@ import org.dforsyth.android.luchadeer.ui.util.SlidingTabLayout;
 import org.dforsyth.android.luchadeer.util.LoaderListResult;
 import org.dforsyth.android.luchadeer.util.LoaderResult;
 import org.dforsyth.android.luchadeer.util.Util;
+import org.dforsyth.android.ravioli.RavioliResponse;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -290,6 +289,23 @@ public class SearchResultsViewPagerFragment extends Fragment implements
 
         @Override
         public LoaderListResult<SearchResult> loadInBackground() {
+            LuchadeerApi api = LuchadeerApi.getInstance(getContext());
+
+            RavioliResponse<LuchadeerApi.GiantBombResponse<ArrayList<SearchResult>>> response = null;
+            Exception error = null;
+            try {
+                response = api.getSearch(
+                    mQuery,
+                    SEARCH_RESOURCE_TYPES
+                ).request(this);
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+                error = e;
+            }
+
+            return new LoaderListResult<SearchResult>(response == null ? null : response.getDecoded().getResults(), error);
+
+            /*
             RequestFuture<LuchadeerApi.GiantBombResponse<ArrayList<SearchResult>>> future = RequestFuture.newFuture();
 
             LuchadeerApi.getInstance(getContext()).search(this, mQuery, SEARCH_RESOURCE_TYPES, future, future);
@@ -307,6 +323,7 @@ public class SearchResultsViewPagerFragment extends Fragment implements
             }
 
             return new LoaderListResult<SearchResult>(response == null ? null : response.getResults(), error);
+            */
         }
 
         @Override
@@ -352,7 +369,7 @@ public class SearchResultsViewPagerFragment extends Fragment implements
             if (searchResults != null) {
                 onSearchResultsRequestCompleted(searchResults);
             } else {
-                Util.handleVolleyError(getActivity(), error);
+                Util.handleRequestError(getActivity(), error);
                 onSearchResultsRequestFailed();
             }
             getLoaderManager().destroyLoader(SEARCH_RESULTS_LOADER_ID);
@@ -389,25 +406,21 @@ public class SearchResultsViewPagerFragment extends Fragment implements
 
         @Override
         public LoaderResult<LuchadeerApi.YouTubeListResponse> loadInBackground() {
-            RequestFuture<LuchadeerApi.YouTubeListResponse> future = RequestFuture.newFuture();
+            LuchadeerApi api = LuchadeerApi.getInstance(getContext());
 
-            LuchadeerApi api = LuchadeerApi.getInstance(null);
-
-            api.unarchivedVideos(this, future, future, null, mQuery);
-
-            LuchadeerApi.YouTubeListResponse response = null;
+            RavioliResponse<LuchadeerApi.YouTubeListResponse> response = null;
             Exception error = null;
             try {
-                response = future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                error = e;
-            } catch (ExecutionException e) {
+                response = api.getUnarchivedVideos(
+                    null,
+                    mQuery
+                ).request(this);
+            } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
                 error = e;
             }
 
-            return new LoaderResult<LuchadeerApi.YouTubeListResponse>(response == null ? null : response, error);
+            return new LoaderResult<>(response == null ? null : response.getDecoded(), error);
         }
 
         @Override
